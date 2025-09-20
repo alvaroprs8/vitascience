@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import Highlight, { defaultProps } from 'prism-react-renderer'
 
 type ArtifactInfo = { title: string; filename: string; type: 'md' | 'sql' | 'json' | 'mmd' | 'txt' }
 
@@ -69,7 +68,6 @@ export default async function ArtifactPage({ params }: { params: Promise<{ name:
                 remarkPlugins={[remarkGfm]}
                 components={{
                   code({ inline, className, children, ...props }) {
-                    const match = /language-(\w+)/.exec(className || '')
                     if (inline) {
                       return (
                         <code className="px-1 py-0.5 rounded bg-slate-100" {...props}>
@@ -78,19 +76,11 @@ export default async function ArtifactPage({ params }: { params: Promise<{ name:
                       )
                     }
                     return (
-                      <Highlight {...defaultProps} code={String(children).trim()} language={(match?.[1] as any) || 'markdown'}>
-                        {({ className: cls, style, tokens, getLineProps, getTokenProps }) => (
-                          <pre className={`${cls} rounded-md p-4 overflow-auto`} style={style}>
-                            {tokens.map((line, i) => (
-                              <div key={i} {...getLineProps({ line, key: i })}>
-                                {line.map((token, key) => (
-                                  <span key={key} {...getTokenProps({ token, key })} />
-                                ))}
-                              </div>
-                            ))}
-                          </pre>
-                        )}
-                      </Highlight>
+                      <pre className={`rounded-md p-4 overflow-auto bg-slate-50 text-slate-800 ${className || ''}`}>
+                        <code className={className} {...props}>
+                          {children}
+                        </code>
+                      </pre>
                     )
                   },
                 }}
