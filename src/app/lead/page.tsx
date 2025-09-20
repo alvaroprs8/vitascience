@@ -16,6 +16,8 @@ export default function LeadPage() {
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<any>(null)
   const [configured, setConfigured] = useState<boolean | null>(null)
+  const [improvedLead, setImprovedLead] = useState('')
+  const [showJson, setShowJson] = useState(false)
 
   useEffect(() => {
     // Check if the backend proxy is configured
@@ -37,6 +39,55 @@ export default function LeadPage() {
       return '__INVALID__'
     }
   }, [metadata])
+
+  function extractImprovedLeadFromJson(data: any): string | undefined {
+    if (!data) return undefined
+
+    const priorityKeys = [
+      'improvedLead', 'leadMelhorada', 'improved_lead', 'novaLead', 'newLead', 'leadRevisada', 'lead_melhorada',
+      'lead', 'content', 'texto', 'text', 'output', 'result'
+    ]
+
+    // Direct hit on priority keys
+    for (const key of priorityKeys) {
+      const value = (data as any)?.[key]
+      if (typeof value === 'string' && value.trim()) return value
+    }
+
+    // Common wrappers (n8n often wraps under data/result)
+    const wrappers = ['data', 'result', 'payload']
+    for (const w of wrappers) {
+      const nested = (data as any)?.[w]
+      if (typeof nested === 'string' && nested.trim()) return nested
+      if (nested && typeof nested === 'object') {
+        const found = extractImprovedLeadFromJson(nested)
+        if (found) return found
+      }
+    }
+
+    // Arrays
+    if (Array.isArray(data)) {
+      for (const item of data) {
+        const found = extractImprovedLeadFromJson(item)
+        if (found) return found
+      }
+    }
+
+    // Fallback: scan any string-valued key that contains likely names
+    if (typeof data === 'object') {
+      for (const [k, v] of Object.entries(data)) {
+        if (typeof v === 'string' && v.trim() && /lead|content|texto|text|improv/i.test(k)) {
+          return v
+        }
+        if (v && typeof v === 'object') {
+          const found = extractImprovedLeadFromJson(v)
+          if (found) return found
+        }
+      }
+    }
+
+    return undefined
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -77,9 +128,16 @@ export default function LeadPage() {
       if (contentType.includes('application/json')) {
         const data = await res.json()
         setResult(data)
+        const improved = extractImprovedLeadFromJson(data)
+        if (typeof improved === 'string') {
+          setImprovedLead(improved)
+        } else {
+          setImprovedLead('')
+        }
       } else {
         const text = await res.text()
         setResult({ raw: text })
+        setImprovedLead(text || '')
       }
     } catch (err: any) {
       setError(err?.message || 'Erro inesperado')
@@ -106,6 +164,22 @@ export default function LeadPage() {
     const a = document.createElement('a')
     a.href = url
     a.download = 'analise-eugene-schwartz.json'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const handleCopyImproved = async () => {
+    if (!improvedLead?.trim()) return
+    await navigator.clipboard.writeText(improvedLead)
+  }
+
+  const handleDownloadImproved = () => {
+    if (!improvedLead?.trim()) return
+    const blob = new Blob([improvedLead], { type: 'text/plain;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = (title?.trim() ? `${title.trim()}-` : '') + 'lead-melhorada.txt'
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -191,19 +265,49 @@ export default function LeadPage() {
           </CardContent>
         </Card>
 
-        {result && (
+        {(improvedLead || result) && (
           <Card className="shadow-sm bg-transparent">
             <CardContent className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h2 className="font-medium">Resultado</h2>
-                <div className="flex items-center gap-2">
-                  <Button size="sm" variant="outline" onClick={handleCopy}>Copiar JSON</Button>
-                  <Button size="sm" onClick={handleDownload}>Baixar JSON</Button>
+              {improvedLead && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h2 className="font-medium">Lead melhorada</h2>
+                    <div className="flex items-center gap-2">
+                      <Button size="sm" variant="outline" onClick={handleCopyImproved}>Copiar</Button>
+                      <Button size="sm" onClick={handleDownloadImproved}>Baixar .txt</Button>
+                    </div>
+                  </div>
+                  <Textarea
+                    value={improvedLead}
+                    onChange={(e) => setImprovedLead(e.target.value)}
+                    className="min-h-64"
+                  />
                 </div>
-              </div>
-              <pre className="text-xs overflow-auto max-h-[500px] p-3 border rounded-md">
+              )}
+
+              {result && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-medium">Resposta (JSON)</h3>
+                    <div className="flex items-center gap-2">
+                      <Button size="sm" variant="outline" onClick={() => setShowJson((v) => !v)}>
+                        {showJson ? 'Ocultar' : 'Mostrar'} JSON
+                      </Button>
+                      {showJson && (
+                        <>
+                          <Button size="sm" variant="outline" onClick={handleCopy}>Copiar JSON</Button>
+                          <Button size="sm" onClick={handleDownload}>Baixar JSON</Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  {showJson && (
+                    <pre className="text-xs overflow-auto max-h-[500px] p-3 border rounded-md">
 {JSON.stringify(result, null, 2)}
-              </pre>
+                    </pre>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
         )}
