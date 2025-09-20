@@ -53,13 +53,23 @@ export default function DeliverablesPage() {
   ]
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-10">
-      <header className="mb-10">
-        <h1 className="text-3xl font-semibold tracking-tight text-slate-900">Entregáveis — Clone Digital Eugene Schwartz</h1>
-        <p className="mt-2 text-sm text-slate-600">
-          Abaixo você encontra todos os artefatos do teste (documentos, diagrama, workflow n8n, schema de banco e validações), além de links rápidos para executar e validar.
-        </p>
-      </header>
+    <div className="mx-auto max-w-6xl">
+      <div className="mb-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Entregáveis — Clone Digital Eugene Schwartz</h1>
+            <p className="mt-1 text-sm text-slate-600">
+              Artefatos do teste (documentos, diagrama, workflow n8n, schema de banco e validações), além de links rápidos para executar e validar.
+            </p>
+          </div>
+          <a
+            href="/lead"
+            className="inline-flex h-9 items-center rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm hover:bg-slate-50"
+          >
+            Abrir UI de Envio
+          </a>
+        </div>
+      </div>
 
       <section className="mb-8">
         <h2 className="text-xl font-medium mb-3 text-slate-900">Acesso Rápido</h2>
@@ -93,7 +103,7 @@ export default function DeliverablesPage() {
 
       <section>
         <h2 className="text-xl font-medium mb-4 text-slate-900">Artefatos</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((it) => (
             <article key={it.title} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
               <h3 className="text-base font-semibold leading-none mb-1 text-slate-900">{it.title}</h3>
