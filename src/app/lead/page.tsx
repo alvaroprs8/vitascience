@@ -355,7 +355,7 @@ export default function LeadPage() {
                 ) : (
                   <>
                     <ChevronRight className="h-4 w-4" />
-                    Criar Analise
+                    Criar Análise
                   </>
                 )}
               </Button>
