@@ -101,9 +101,7 @@ function APIsSection({
             cta="Abrir"
             Icon={CodeIcon}
             className="col-span-1"
-            background={
-              <div className="absolute inset-0 -z-10 bg-gradient-to-br from-sky-50 to-indigo-50 dark:from-slate-900 dark:to-slate-800" />
-            }
+            background={null}
           />
         ))}
       </BentoGrid>
@@ -129,9 +127,7 @@ function ArtefatosSection({
             cta="Abrir"
             Icon={FileTextIcon}
             className="col-span-1"
-            background={
-              <div className="absolute inset-0 -z-10 bg-gradient-to-br from-amber-50 to-rose-50 dark:from-slate-900 dark:to-slate-800" />
-            }
+            background={null}
             extraActions={
               <Button variant="ghost" size="sm" asChild>
                 <a href={it.href} download>
