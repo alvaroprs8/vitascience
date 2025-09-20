@@ -18,8 +18,9 @@ const ARTIFACTS: Record<string, ArtifactInfo> = {
 
 export const dynamic = 'force-dynamic'
 
-export default async function ArtifactPage({ params }: { params: { name: string } }) {
-  const info = ARTIFACTS[params.name]
+export default async function ArtifactPage({ params }: { params: Promise<{ name: string }> }) {
+  const { name } = await params
+  const info = ARTIFACTS[name]
   if (!info) return notFound()
 
   const abs = path.join(process.cwd(), 'public', 'deliverables', info.filename)
