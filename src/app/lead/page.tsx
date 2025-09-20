@@ -109,7 +109,7 @@ export default function LeadPage() {
 
     // Highest priority: explicit original lead fields
     const explicitKeys = [
-      'originalLead', 'leadOriginal', 'original_lead', 'lead_input', 'inputLead',
+      'originalLead', 'leadOriginal', 'original_lead', 'lead_input', 'inputLead', 'vsl_copy',
     ]
     for (const key of explicitKeys) {
       const value = (data as any)?.[key]
@@ -124,6 +124,8 @@ export default function LeadPage() {
       if (nested && typeof nested === 'object') {
         const directLead = (nested as any)?.lead
         if (typeof directLead === 'string' && directLead.trim()) return directLead
+        const directVslCopy = (nested as any)?.vsl_copy
+        if (typeof directVslCopy === 'string' && directVslCopy.trim()) return directVslCopy
         const found = extractOriginalLeadFromJson(nested)
         if (found) return found
       }
