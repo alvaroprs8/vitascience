@@ -128,18 +128,25 @@ export default function DeliverablesPage() {
             </div>
           </section>
 
-          <section id="workflow" className="mb-12">
-            <h2 className="mb-4 text-xl font-medium">Status dos Entregáveis</h2>
+          <section id="workflow" className="mb-12 scroll-mt-24">
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="text-xl font-medium">Status dos Entregáveis</h2>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="inline-flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-green-500" /> Concluído</span>
+                <span className="inline-flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-amber-500" /> Em andamento</span>
+                <span className="inline-flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-full bg-slate-400" /> Pendente</span>
+              </div>
+            </div>
             <div className="overflow-hidden rounded-xl border">
-              <RadialOrbitalTimeline timelineData={timelineData} />
+              <RadialOrbitalTimeline timelineData={timelineData} height={560} />
             </div>
           </section>
 
-          <section id="quick" className="mb-10">
+          <section id="quick" className="mb-10 scroll-mt-24">
             <h2 className="mb-3 text-xl font-medium">Acesso Rápido</h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {quickLinks.map((l) => (
-                <Card key={l.href}>
+                <Card key={l.href} className="h-full">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-base">
                       <l.icon className="h-4 w-4 text-primary" /> {l.label}
@@ -155,7 +162,7 @@ export default function DeliverablesPage() {
             </div>
           </section>
 
-          <section id="apis" className="mb-12">
+          <section id="apis" className="mb-12 scroll-mt-24">
             <h2 className="mb-3 text-xl font-medium">APIs</h2>
             <div className="mb-4 flex justify-center">
               <DatabaseWithRestApi title="API do Clone (Next.js)" circleText="API" />
@@ -181,11 +188,11 @@ export default function DeliverablesPage() {
             </div>
           </section>
 
-          <section id="docs">
+          <section id="docs" className="scroll-mt-24">
             <h2 className="mb-4 text-xl font-medium">Documentos</h2>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {items.map((it) => (
-                <Card key={it.title} className="hover:shadow-sm">
+                <Card key={it.title} className="hover:shadow-sm h-full flex flex-col">
                   <CardHeader className="pb-2">
                     <div className="flex items-center gap-2">
                       <div className="rounded-md bg-muted p-2">
@@ -203,7 +210,7 @@ export default function DeliverablesPage() {
                   <CardContent className="text-sm text-muted-foreground">
                     {it.description}
                   </CardContent>
-                  <CardFooter className="gap-2">
+                  <CardFooter className="mt-auto gap-2">
                     <Button asChild variant="outline" size="sm" className="flex-1">
                       <a href={it.href} target="_blank" rel="noreferrer">Abrir</a>
                     </Button>

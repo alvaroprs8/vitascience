@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { cn } from "@/lib/utils";
 import { ArrowRight, Link, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,10 +20,14 @@ interface TimelineItem {
 
 interface RadialOrbitalTimelineProps {
   timelineData: TimelineItem[];
+  className?: string;
+  height?: number | string; // e.g., 560 or '32rem' or '100vh'
 }
 
 export default function RadialOrbitalTimeline({
   timelineData,
+  className,
+  height,
 }: RadialOrbitalTimelineProps) {
   const [expandedItems, setExpandedItems] = useState<Record<number, boolean>>(
     {}
@@ -152,9 +157,14 @@ export default function RadialOrbitalTimeline({
     }
   };
 
+  const containerStyle = {
+    height: typeof height === "number" ? `${height}px` : height || "100vh",
+  } as React.CSSProperties
+
   return (
     <div
-      className="w-full h-screen flex flex-col items-center justify-center bg-black overflow-hidden"
+      className={cn("w-full flex flex-col items-center justify-center bg-black overflow-hidden", className)}
+      style={containerStyle}
       ref={containerRef}
       onClick={handleContainerClick}
     >
