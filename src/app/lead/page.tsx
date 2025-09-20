@@ -292,6 +292,11 @@ export default function LeadPage() {
     }
   }
 
+  // Carregar histórico ao montar a página
+  useEffect(() => {
+    loadHistory().catch(() => {})
+  }, [])
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-slate-50 py-8">
       <div className="container max-w-4xl mx-auto space-y-6 px-4 sm:px-6">
