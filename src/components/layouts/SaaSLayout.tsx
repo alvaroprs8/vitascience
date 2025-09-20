@@ -3,7 +3,6 @@
 import React from "react";
 import { Dock } from "@/components/ui/dock-two";
 import { Home, Layers, Link2, Workflow } from "lucide-react";
-import { FileText, Workflow, BookOpen, Database, GitBranch, Link2, Home, Download } from "lucide-react";
 
 type SaaSLayoutProps = {
   children: React.ReactNode
