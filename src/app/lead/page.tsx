@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
@@ -14,6 +14,7 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Separator } from '@/components/ui/separator'
+import { History, LogOut, Upload, Wand2, Loader2, FileDown, Copy, ListChecks, Lightbulb, PanelsTopLeft } from 'lucide-react'
 
 export default function LeadPage() {
   const supabase = React.useMemo(() => createSupabaseBrowserClient(), [])
@@ -302,15 +303,18 @@ export default function LeadPage() {
   }
 
   return (
-    <div className="min-h-screen py-8">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 py-8">
       <div className="container max-w-3xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-semibold">Enviar Lead da VSL</h1>
+          <div>
+            <h1 className="text-xl font-semibold tracking-tight">Analisador de Leads</h1>
+            <p className="text-sm text-muted-foreground">Envie a lead da VSL, acompanhe o processamento e visualize as análises.</p>
+          </div>
           <div className="flex items-center gap-2">
             <a href="/" className="text-sm underline">Voltar</a>
             <Sheet open={historyOpen} onOpenChange={(o) => { setHistoryOpen(o); if (o) loadHistory().catch(() => {}) }}>
               <SheetTrigger asChild>
-                <Button variant="outline" size="sm">Histórico</Button>
+                <Button variant="outline" size="sm"><History className="mr-2 h-4 w-4" />Histórico</Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[420px] sm:w-[480px]">
                 <SheetHeader>
@@ -331,7 +335,9 @@ export default function LeadPage() {
                         </div>
                         <div className="flex items-center gap-2">
                           {h.hasImproved && <Badge variant="secondary">Lead</Badge>}
-                          <Button size="sm" onClick={() => loadAnalysis(h.id)}>Abrir</Button>
+                          <Button size="sm" onClick={() => loadAnalysis(h.id)}>
+                            Abrir
+                          </Button>
                         </div>
                       </div>
                     ))}
@@ -339,7 +345,7 @@ export default function LeadPage() {
                 </div>
               </SheetContent>
             </Sheet>
-            <Button variant="outline" size="sm" onClick={handleSignOut}>Sair</Button>
+            <Button variant="outline" size="sm" onClick={handleSignOut}><LogOut className="mr-2 h-4 w-4" />Sair</Button>
           </div>
         </div>
 
@@ -350,6 +356,10 @@ export default function LeadPage() {
         )}
 
         <Card className="shadow-sm bg-transparent">
+          <CardHeader className="pb-2">
+            <CardTitle>Enviar Lead</CardTitle>
+            <CardDescription>Você pode colar o texto ou fazer upload de um arquivo; inclua metadata JSON opcional.</CardDescription>
+          </CardHeader>
           <CardContent>
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="grid gap-2">
@@ -403,14 +413,14 @@ export default function LeadPage() {
 
               <div className="flex items-center gap-3">
                 <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? 'Enviando...' : 'Analisar Lead'}
+                  {isSubmitting ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" />Enviando...</>) : (<><Wand2 className="mr-2 h-4 w-4" />Analisar Lead</>)}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => {
                   setTitle('Exemplo - Vitascience')
                   setLead('"Você está cansado de tentar de tudo para melhorar sua saúde e não ver resultados? ..."\n\nApresentamos um método baseado em ciência que transforma hábitos em resultados duradouros...')
                   setMetadata('{"idioma":"pt-BR"}')
-                }}>Preencher Exemplo</Button>
-                <Button type="button" variant="ghost" onClick={() => { setTitle(''); setLead(''); setMetadata(''); setResult(null); setError(null) }}>Limpar</Button>
+                }}><PanelsTopLeft className="mr-2 h-4 w-4" />Preencher Exemplo</Button>
+                <Button type="button" variant="ghost" onClick={() => { setTitle(''); setLead(''); setMetadata(''); setResult(null); setError(null) }}><ListChecks className="mr-2 h-4 w-4" />Limpar</Button>
               </div>
             </form>
           </CardContent>
@@ -420,7 +430,7 @@ export default function LeadPage() {
           <Card className="shadow-sm bg-transparent">
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between">
-                <h2 className="font-medium">Processando no n8n...</h2>
+                <h2 className="font-medium flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Processando no n8n...</h2>
                 <span className="text-xs text-muted-foreground">Aguarde — atualizando automaticamente</span>
               </div>
             </CardContent>
