@@ -38,7 +38,6 @@ export default function LeadPage() {
   const supabase = React.useMemo(() => createSupabaseBrowserClient(), [])
   const [lead, setLead] = useState('')
   const [title, setTitle] = useState('')
-  const [metadata, setMetadata] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<any>(null)
@@ -59,14 +58,7 @@ export default function LeadPage() {
     }).catch(() => setConfigured(false))
   }, [])
 
-  const parsedMetadata = useMemo(() => {
-    if (!metadata.trim()) return undefined
-    try {
-      return JSON.parse(metadata)
-    } catch {
-      return '__INVALID__'
-    }
-  }, [metadata])
+  // metadata removido conforme solicitação
 
   function extractImprovedLeadFromJson(data: any): string | undefined {
     if (!data) return undefined
@@ -152,16 +144,13 @@ export default function LeadPage() {
       setError('Informe a Lead da VSL.')
       return
     }
-    if (parsedMetadata === '__INVALID__') {
-      setError('Metadata deve ser um JSON válido.')
-      return
-    }
+    // validação de metadata removida
 
     setIsSubmitting(true)
     try {
       const payload: any = { lead }
       if (title.trim()) payload.title = title.trim()
-      if (parsedMetadata) payload.metadata = parsedMetadata
+      // metadata removido do payload
 
       const res = await fetch('/api/submit-lead', {
         method: 'POST',
@@ -460,25 +449,6 @@ export default function LeadPage() {
                 </div>
               </div>
 
-              <div className="grid gap-2">
-                <Label htmlFor="metadata" className="flex items-center gap-1.5">
-                  <Code2 className="h-3.5 w-3.5" />
-                  Metadata (JSON opcional)
-                </Label>
-                <Textarea
-                  id="metadata"
-                  value={metadata}
-                  onChange={(e) => setMetadata(e.target.value)}
-                  placeholder='{"produto":"Suplemento X","mercado":"Saúde"}'
-                  className="min-h-24 resize-y font-mono text-sm"
-                />
-                {parsedMetadata === '__INVALID__' && (
-                  <span className="text-xs text-red-700 flex items-center gap-1.5">
-                    <Info className="h-3.5 w-3.5 text-red-500" />
-                    JSON inválido. Verifique a formatação.
-                  </span>
-                )}
-              </div>
 
               {error && (
                 <div className="bg-red-50 text-red-700 rounded-md px-3 py-2 text-sm flex items-center gap-2">
@@ -507,7 +477,7 @@ export default function LeadPage() {
                   onClick={() => {
                   setTitle('Exemplo - Vitascience')
                     setLead('\"Você está cansado de tentar de tudo para melhorar sua saúde e não ver resultados? ...\"\n\nApresentamos um método baseado em ciência que transforma hábitos em resultados duradouros...')
-                  setMetadata('{"idioma":"pt-BR"}')
+                  // metadata removido
                   }}
                   className="gap-2"
                 >
@@ -520,7 +490,7 @@ export default function LeadPage() {
                   onClick={() => { 
                     setTitle(''); 
                     setLead(''); 
-                    setMetadata(''); 
+                    // metadata removido
                     setResult(null); 
                     setError(null);
                     setImprovedLead('');
@@ -592,9 +562,9 @@ export default function LeadPage() {
                     </TabsTrigger>
                   )}
               {improvedLead && (
-                    <TabsTrigger value="lead" className="flex items-center gap-1.5 h-9">
+                  <TabsTrigger value="comparativo" className="flex items-center gap-1.5 h-9">
                       <FileText className="h-4 w-4" />
-                      Lead
+                    Comparativo
                     </TabsTrigger>
                   )}
                   {result && (
@@ -821,28 +791,45 @@ export default function LeadPage() {
                 )}
 
                 {improvedLead && (
-                  <TabsContent value="lead" className="space-y-4">
+                  <TabsContent value="comparativo" className="space-y-4">
                     <div className="flex items-center gap-2">
                       <Button size="sm" variant="outline" onClick={handleCopyImproved} className="gap-2">
                         <Copy className="h-4 w-4" />
-                        Copiar
+                        Copiar melhorada
                       </Button>
                       <Button size="sm" onClick={handleDownloadImproved} className="gap-2">
                         <Download className="h-4 w-4" />
-                        Baixar .txt
+                        Baixar melhorada .txt
                       </Button>
-                  </div>
-                    <Card className="bg-white border-slate-200">
-                      <CardContent className="pt-6">
-                  <Textarea
-                    value={improvedLead}
-                    onChange={(e) => setImprovedLead(e.target.value)}
-                          className="min-h-64 resize-y"
-                  />
-                      </CardContent>
-                    </Card>
+                    </div>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <Card className="bg-white border-slate-200">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm">Lead original</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <Textarea
+                            value={lead}
+                            onChange={(e) => setLead(e.target.value)}
+                            className="min-h-64 resize-y"
+                          />
+                        </CardContent>
+                      </Card>
+                      <Card className="bg-white border-slate-200">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm">Lead melhorada</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <Textarea
+                            value={improvedLead}
+                            onChange={(e) => setImprovedLead(e.target.value)}
+                            className="min-h-64 resize-y"
+                          />
+                        </CardContent>
+                      </Card>
+                    </div>
                   </TabsContent>
-              )}
+                )}
 
               {result && (
                   <TabsContent value="json" className="space-y-4">
