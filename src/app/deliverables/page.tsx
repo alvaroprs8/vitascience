@@ -1,0 +1,130 @@
+export default function DeliverablesPage() {
+  const items: Array<{
+    title: string
+    description: string
+    href: string
+    actions?: Array<{ label: string, href: string }>
+  }> = [
+    {
+      title: 'Documento de Concepção',
+      description: 'Arquitetura, decisões e trade-offs da solução (Markdown).',
+      href: '/deliverables/CONCEPCAO.md',
+    },
+    {
+      title: 'Diagrama (Mermaid)',
+      description: 'Fluxo end-to-end: ingestão RAG, análise no n8n, callback e consumo.',
+      href: '/deliverables/DIAGRAMA.mmd',
+    },
+    {
+      title: 'Documentação dos Prompts',
+      description: 'Todos os prompts usados (consciência, estrutura, melhorias, ângulos, agente Eugene).',
+      href: '/deliverables/PROMPTS.md',
+    },
+    {
+      title: 'Workflow do n8n (JSON)',
+      description: 'Export do workflow para import direto no n8n.',
+      href: '/deliverables/n8n-workflow.json',
+    },
+    {
+      title: 'Estrutura do Banco de Dados',
+      description: 'DDL da tabela lead_results e índices (PostgreSQL/Supabase).',
+      href: '/deliverables/DB_SCHEMA.sql',
+    },
+    {
+      title: 'Validação e Testes',
+      description: 'Análise completa da VSL enviada e critérios de avaliação do clone.',
+      href: '/deliverables/VALIDATION.md',
+    },
+    {
+      title: 'Link do Loom',
+      description: 'Vídeo (5–10 min) demonstrando tudo funcionando.',
+      href: '/deliverables/LOOM.md',
+    },
+  ]
+
+  const quickLinks = [
+    { label: 'Enviar Lead (UI)', href: '/lead' },
+  ]
+
+  const apiLinks = [
+    { label: 'POST /api/submit-lead', href: '/api/submit-lead' },
+    { label: 'GET  /api/lead/status?id={correlationId}', href: '/api/lead/status' },
+    { label: 'POST /api/lead/callback', href: '/api/lead/callback' },
+  ]
+
+  return (
+    <div className="mx-auto max-w-5xl px-6 py-10">
+      <header className="mb-10">
+        <h1 className="text-3xl font-semibold tracking-tight">Entregáveis — Clone Digital Eugene Schwartz</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Abaixo você encontra todos os artefatos do teste (documentos, diagrama, workflow n8n, schema de banco e validações), além de links rápidos para executar e validar.
+        </p>
+      </header>
+
+      <section className="mb-8">
+        <h2 className="text-xl font-medium mb-3">Acesso Rápido</h2>
+        <div className="flex flex-wrap gap-3">
+          {quickLinks.map((l) => (
+            <a
+              key={l.href}
+              href={l.href}
+              className="inline-flex items-center rounded-md border px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
+            >
+              {l.label}
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section className="mb-8">
+        <h2 className="text-xl font-medium mb-3">APIs</h2>
+        <div className="flex flex-wrap gap-3">
+          {apiLinks.map((l) => (
+            <a
+              key={l.href}
+              href={l.href}
+              className="inline-flex items-center rounded-md border px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
+            >
+              {l.label}
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <h2 className="text-xl font-medium mb-4">Artefatos</h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {items.map((it) => (
+            <article key={it.title} className="rounded-lg border p-4">
+              <h3 className="text-base font-semibold leading-none mb-1">{it.title}</h3>
+              <p className="text-sm text-muted-foreground mb-3">{it.description}</p>
+              <div className="flex gap-2">
+                <a
+                  href={it.href}
+                  className="inline-flex items-center rounded-md border px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
+                >
+                  Abrir
+                </a>
+                <a
+                  href={it.href}
+                  download
+                  className="inline-flex items-center rounded-md border px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
+                >
+                  Download
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <footer className="mt-10 text-xs text-muted-foreground">
+        <p>
+          Observação: os arquivos acima ficam em <code>/public/deliverables/</code>. Substitua pelos definitivos conforme for finalizando.
+        </p>
+      </footer>
+    </div>
+  )
+}
+
+

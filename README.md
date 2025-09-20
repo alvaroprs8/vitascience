@@ -212,34 +212,3 @@ To learn more about Igniter.js and its powerful features, check out the official
 ## License
 
 This starter is licensed under the [MIT License](LICENSE).
-
-## Como Executar (Vitascience Lead Analyzer)
-
-### 1) Variáveis de Ambiente
-Defina no Vercel/Local:
-- N8N_WEBHOOK_URL
-- N8N_WEBHOOK_AUTH (opcional)
-- N8N_CALLBACK_SECRET
-- NEXT_PUBLIC_IGNITER_API_URL
-- SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY
-- PINECONE_API_KEY, PINECONE_ENV, PINECONE_INDEX=eugene-schwartz-index
-
-### 2) Banco de Dados
-Execute `docs/DB.sql` no Postgres/Supabase para criar a tabela `lead_results`.
-
-### 3) n8n
-- Importe o workflow: `workflows/eugene-schwartz.json` (substitua o placeholder pelo seu export final).
-- Configure as credenciais OpenAI/Anthropic e Pinecone, e ajuste modelos reais (ex.: gpt-4o-mini, Claude 3.5).
-
-### 4) Vetorização
-- Use os nós de vetorização (Manual Trigger) para indexar o PDF do Breakthrough Advertising.
-
-### 5) Execução
-- `npm run dev`
-- Acesse `/lead`, cole/importe a Lead, envie e acompanhe o processamento.
-- Use o botão "Histórico" para abrir análises anteriores.
-
-### 6) Documentação adicional
-- Concepção: `docs/CONCEPCAO.md`
-- Prompts: `docs/PROMPTS.md`
-- Amostras: `samples/analise_vsl.json` e `samples/lead_melhorada.txt`

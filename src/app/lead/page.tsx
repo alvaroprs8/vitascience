@@ -435,16 +435,16 @@ export default function LeadPage() {
                       <Upload className="h-3.5 w-3.5" />
                       Carregar arquivo
                     </Label>
-                    <input
+                  <input
                       id="file-upload"
-                      type="file"
-                      accept=".txt,.md,.rtf,.html,.docx,.pdf"
+                    type="file"
+                    accept=".txt,.md,.rtf,.html,.docx,.pdf"
                       className="sr-only"
-                      onChange={(e) => {
-                        const f = e.target.files?.[0]
-                        if (f) handleFileUpload(f).catch(() => {})
-                      }}
-                    />
+                    onChange={(e) => {
+                      const f = e.target.files?.[0]
+                      if (f) handleFileUpload(f).catch(() => {})
+                    }}
+                  />
                   </div>
                 </div>
                 <Textarea
@@ -505,9 +505,9 @@ export default function LeadPage() {
                   type="button" 
                   variant="outline" 
                   onClick={() => {
-                    setTitle('Exemplo - Vitascience')
+                  setTitle('Exemplo - Vitascience')
                     setLead('\"Você está cansado de tentar de tudo para melhorar sua saúde e não ver resultados? ...\"\n\nApresentamos um método baseado em ciência que transforma hábitos em resultados duradouros...')
-                    setMetadata('{"idioma":"pt-BR"}')
+                  setMetadata('{"idioma":"pt-BR"}')
                   }}
                   className="gap-2"
                 >
@@ -591,7 +591,7 @@ export default function LeadPage() {
                       Q&A
                     </TabsTrigger>
                   )}
-                  {improvedLead && (
+              {improvedLead && (
                     <TabsTrigger value="lead" className="flex items-center gap-1.5 h-9">
                       <FileText className="h-4 w-4" />
                       Lead
@@ -745,7 +745,7 @@ export default function LeadPage() {
                       {((analysis as any).improvements as any[]).slice(0, 5).map((item: any, idx: number) => (
                         <AccordionItem key={idx} value={`imp-${idx}`} className="border-b border-border">
                           <AccordionTrigger className="hover:no-underline py-4 px-4">
-                            <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
                               <Badge variant="secondary">{idx + 1}</Badge>
                               <span className="text-left font-medium">{item?.problema || `Ponto ${idx + 1}`}</span>
                             </div>
@@ -813,7 +813,7 @@ export default function LeadPage() {
                         <ScrollArea className="h-[400px] pr-4">
                           <div className="text-sm whitespace-pre-wrap">
                             {(analysis as any).qna}
-                          </div>
+                    </div>
                         </ScrollArea>
                       </CardContent>
                     </Card>
@@ -831,20 +831,20 @@ export default function LeadPage() {
                         <Download className="h-4 w-4" />
                         Baixar .txt
                       </Button>
-                    </div>
+                  </div>
                     <Card className="bg-background/50">
                       <CardContent className="pt-6">
-                        <Textarea
-                          value={improvedLead}
-                          onChange={(e) => setImprovedLead(e.target.value)}
+                  <Textarea
+                    value={improvedLead}
+                    onChange={(e) => setImprovedLead(e.target.value)}
                           className="min-h-64 resize-y"
-                        />
+                  />
                       </CardContent>
                     </Card>
                   </TabsContent>
-                )}
+              )}
 
-                {result && (
+              {result && (
                   <TabsContent value="json" className="space-y-4">
                     <div className="flex items-center gap-2">
                       <Button size="sm" variant="outline" onClick={handleCopy} className="gap-2">
@@ -859,12 +859,12 @@ export default function LeadPage() {
                     <Card className="bg-background/50">
                       <CardContent className="pt-6">
                         <pre className="text-xs overflow-auto max-h-[500px] p-3 border rounded-md bg-muted/30 font-mono">
-                          {JSON.stringify(result, null, 2)}
-                        </pre>
+{JSON.stringify(result, null, 2)}
+                    </pre>
                       </CardContent>
                     </Card>
                   </TabsContent>
-                )}
+                  )}
               </Tabs>
             </CardContent>
           </Card>

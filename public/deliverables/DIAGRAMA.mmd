@@ -1,0 +1,20 @@
+flowchart TD
+  subgraph App [Next.js App]
+    UI["/lead (UI)"] --> SUBMIT["POST /api/submit-lead"]
+    STATUS["GET /api/lead/status?id="]
+  end
+
+  SUBMIT -->|vsl_copy, title, metadata, correlationId, callbackUrl| N8N[n8n Webhook analyze-vsl-copy]
+  N8N --> ANALYSES[Análises LLM + RAG + Agent Eugene]
+  ANALYSES --> CALLBACK["POST /api/lead/callback (X-Callback-Secret)"]
+  CALLBACK --> DB[(Supabase: lead_results)]
+  DB --> STATUS
+  STATUS --> UI
+
+  subgraph Ingestão RAG
+    DL[Download PDF (Google Drive)] --> SPLIT[Text Splitter]
+    SPLIT --> EMB[OpenAI Embeddings]
+    EMB --> PINECONE[(Pinecone Insert)]
+  end
+
+  PINECONE -.-> ANALYSES
