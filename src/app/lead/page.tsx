@@ -341,7 +341,12 @@ export default function LeadPage() {
                   Insira o texto da lead para receber uma análise detalhada e sugestões de melhoria
                 </CardDescription>
               </div>
-              <Button size="sm" variant="outline" onClick={() => setShowForm((v) => !v)} className="gap-2">
+              <Button
+                size="sm"
+                variant={showForm ? 'outline' : 'default'}
+                onClick={() => setShowForm((v) => !v)}
+                className={`gap-2 ${showForm ? '' : 'bg-emerald-600 hover:bg-emerald-700 text-white'}`}
+              >
                 {showForm ? (
                   <>
                     <ChevronRight className="h-4 w-4 rotate-90" />
@@ -350,7 +355,7 @@ export default function LeadPage() {
                 ) : (
                   <>
                     <ChevronRight className="h-4 w-4" />
-                    Mostrar
+                    Criar Analise
                   </>
                 )}
               </Button>
