@@ -20,10 +20,9 @@ Welcome to the Igniter.js starter for building full-stack, type-safe application
 -   **Seamless Integration**: Uses the `nextRouteHandlerAdapter` to cleanly connect the Igniter.js router to the Next.js App Router.
 -   **UI Components**: Includes a set of UI components from `shadcn/ui` to get you started quickly.
 
-## Deliverables
+## Artefatos
 
-- Acesse a página de entregáveis: `/deliverables`.
-- Artefatos públicos em `public/deliverables/` (concepção, prompts, diagrama Mermaid, DDL, validação, Loom, workflow n8n).
+- Artefatos públicos em `public/deliverables/` (concepção, prompts, diagrama Mermaid, DDL, validação, Loom, workflow n8n). A navegação direta pela UI foi removida.
 
 ## Prerequisites
 
@@ -165,7 +164,6 @@ This app includes a minimal interface to submit VSL leads and trigger the n8n wo
 ### Pages
 
 - `/lead`: Form to paste or upload the Lead text, optional title and metadata (JSON). Submits to `/api/submit-lead` and displays the JSON analysis response.
-- `/deliverables`: Dashboard com todos os entregáveis para fácil acesso.
 
 ### API
 

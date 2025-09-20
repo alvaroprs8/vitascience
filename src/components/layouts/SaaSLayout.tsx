@@ -10,9 +10,9 @@ type SaaSLayoutProps = {
 
 export function SaaSLayout({ children }: SaaSLayoutProps) {
   const menuItems = [
-    { icon: Home, label: "Visão geral", onClick: () => { window.location.href = "/deliverables" } },
-    { icon: Layers, label: "Artefatos", onClick: () => { window.location.href = "/deliverables#artefatos" } },
-    { icon: Link2, label: "APIs", onClick: () => { window.location.href = "/deliverables#apis" } },
+    { icon: Home, label: "Visão geral", onClick: () => { window.location.href = "/" } },
+    { icon: Layers, label: "Artefatos", onClick: () => { window.location.href = "/" } },
+    { icon: Link2, label: "APIs", onClick: () => { window.location.href = "/api/submit-lead" } },
     { icon: Workflow, label: "Clone do Eugene", onClick: () => { window.location.href = "/lead" } },
   ] as const;
 
