@@ -30,7 +30,14 @@ export async function POST(request: NextRequest) {
     const correlationId = randomUUID()
     const callbackUrl = `${baseUrl}/api/lead/callback`
 
-    const asyncPayload = { ...payload, correlationId, callbackUrl }
+    // Mapear para o formato esperado pelo n8n: vsl_copy
+    const baseInput = {
+      vsl_copy: payload.vsl_copy || payload.lead,
+      title: payload.title,
+      metadata: payload.metadata,
+    }
+
+    const asyncPayload = { ...baseInput, correlationId, callbackUrl }
 
     const n8nResponse = await fetch(n8nUrl, {
       method: 'POST',
