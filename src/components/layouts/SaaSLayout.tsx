@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
+import { Dock } from "@/components/ui/dock-two";
 import { FileText, Workflow, BookOpen, Database, GitBranch, Link2, Home, Download } from "lucide-react";
 
 type SaaSLayoutProps = {
@@ -29,38 +29,38 @@ export function SaaSLayout({ children }: SaaSLayoutProps) {
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-white to-slate-50">
-      <div className="mx-auto flex h-full max-w-[1400px]">
-        <Sidebar>
-          <SidebarBody className="border-r border-slate-200 bg-white">
-            <div className="flex h-full flex-col">
-              <div className="mb-4 px-1 py-2">
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded-lg bg-slate-900" />
-                  <div className="font-semibold tracking-tight text-slate-900">Vitascience</div>
-                </div>
-                <div className="mt-1 text-xs text-slate-500">Entrega — Clone Eugene</div>
-              </div>
-
-              <div className="flex-1 space-y-2">
-                {links.map((l) => (
-                  <SidebarLink key={l.href} link={l} />
-                ))}
-
-                <div className="mt-5 text-[10px] uppercase tracking-wider text-slate-500">APIs</div>
-                {apiLinks.map((l) => (
-                  <SidebarLink key={l.href} link={l} />
-                ))}
-              </div>
-
-              <div className="mt-auto border-t border-slate-200 pt-3 text-xs text-slate-500">
-                <div>v1.0.0</div>
-                <div className="text-slate-400">Atualizado automaticamente</div>
-              </div>
+      <div className="mx-auto flex max-w-[1400px]">
+        <aside className="sticky top-0 h-[100dvh] w-[260px] flex-shrink-0 border-r border-slate-200 bg-white px-3 py-4 hidden md:block">
+          <div className="mb-4 px-1 py-2">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-lg bg-slate-900" />
+              <div className="font-semibold tracking-tight text-slate-900">Vitascience</div>
             </div>
-          </SidebarBody>
-        </Sidebar>
-
-        <main className="flex-1">
+            <div className="mt-1 text-xs text-slate-500">Entrega — Clone Eugene</div>
+          </div>
+          <Dock
+            orientation="vertical"
+            items={[
+              ...links.map((l) => ({
+                icon: (() => require("lucide-react")[l.icon?.type?.displayName || l.icon?.type?.name || 'Home'])(),
+                label: l.label,
+                onClick: () => { window.location.href = l.href }
+              })),
+              { icon: require("lucide-react").Link2, label: 'APIs', onClick: () => {} },
+              ...apiLinks.map((l) => ({
+                icon: require("lucide-react").Link2,
+                label: l.label,
+                onClick: () => { window.location.href = l.href }
+              })),
+            ]}
+            className="h-[calc(100dvh-100px)]"
+          />
+          <div className="mt-3 border-t border-slate-200 pt-3 text-xs text-slate-500">
+            <div>v1.0.0</div>
+            <div className="text-slate-400">Atualizado automaticamente</div>
+          </div>
+        </aside>
+        <main className="flex-1 min-w-0">
           <div className="px-6 py-8 sm:px-8">
             {children}
           </div>
