@@ -9,10 +9,11 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+import { Separator } from '@/components/ui/separator'
 
 export default function LeadPage() {
   const supabase = React.useMemo(() => createSupabaseBrowserClient(), [])
@@ -271,6 +272,35 @@ export default function LeadPage() {
     window.location.href = '/auth/login'
   }
 
+  const [historyOpen, setHistoryOpen] = useState(false)
+  const [history, setHistory] = useState<Array<{ id: string, title?: string | null, status: string, receivedAt: number | null, hasImproved: boolean }>>([])
+
+  const loadHistory = async () => {
+    try {
+      const res = await fetch('/api/lead/list?limit=50', { cache: 'no-store' })
+      const data = await res.json()
+      setHistory(Array.isArray(data.items) ? data.items : [])
+    } catch {}
+  }
+
+  const loadAnalysis = async (id: string) => {
+    try {
+      const res = await fetch(`/api/lead/get?id=${encodeURIComponent(id)}`, { cache: 'no-store' })
+      const contentType = res.headers.get('content-type') || ''
+      const data = contentType.includes('application/json') ? await res.json() : null
+      if (!res.ok) throw new Error(data?.error || 'Falha ao carregar análise')
+      setIsWaiting(false)
+      setResult(data)
+      const improved = extractImprovedLeadFromJson(data)
+      setImprovedLead(typeof improved === 'string' ? improved : '')
+      setShowJson(false)
+      setCorrelationId(data?.correlationId || null)
+      setHistoryOpen(false)
+    } catch (err: any) {
+      setError(err?.message || 'Erro ao carregar análise')
+    }
+  }
+
   return (
     <div className="min-h-screen py-8">
       <div className="container max-w-3xl mx-auto space-y-6">
@@ -278,6 +308,37 @@ export default function LeadPage() {
           <h1 className="text-xl font-semibold">Enviar Lead da VSL</h1>
           <div className="flex items-center gap-2">
             <a href="/" className="text-sm underline">Voltar</a>
+            <Sheet open={historyOpen} onOpenChange={(o) => { setHistoryOpen(o); if (o) loadHistory().catch(() => {}) }}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="sm">Histórico</Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[420px] sm:w-[480px]">
+                <SheetHeader>
+                  <SheetTitle>Histórico de Análises</SheetTitle>
+                </SheetHeader>
+                <div className="mt-4 space-y-3">
+                  {history.length === 0 && (
+                    <div className="text-sm text-muted-foreground">Nenhum item encontrado.</div>
+                  )}
+                  <div className="space-y-2">
+                    {history.map((h) => (
+                      <div key={h.id} className="border rounded-md p-3 flex items-center justify-between">
+                        <div className="min-w-0">
+                          <div className="text-sm font-medium truncate">{h.title || h.id}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {h.status}{h.receivedAt ? ` • ${new Date(h.receivedAt).toLocaleString()}` : ''}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {h.hasImproved && <Badge variant="secondary">Lead</Badge>}
+                          <Button size="sm" onClick={() => loadAnalysis(h.id)}>Abrir</Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
             <Button variant="outline" size="sm" onClick={handleSignOut}>Sair</Button>
           </div>
         </div>
