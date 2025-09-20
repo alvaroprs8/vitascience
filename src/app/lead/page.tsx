@@ -91,6 +91,31 @@ export default function LeadPage() {
     return undefined
   }
 
+  // Safely get the root object containing our analysis fields, regardless of nesting
+  const resultRoot = useMemo(() => {
+    if (!result) return null
+    // Common shapes:
+    // - Async callback: { status, improvedLead, data: { title, metadata, data: { ...analysis } } }
+    // - Direct: { ...analysis, improvedLead? }
+    // - Wrapped: { data: { ...analysis } }
+    const r = result as any
+    const candidate = r?.data?.data || r?.data || r
+    return candidate || null
+  }, [result])
+
+  const analysis = useMemo(() => {
+    const root = resultRoot as any
+    if (!root) return {}
+    // Try several likely keys for each section
+    const consciousness = root.analise_nivel_consciencia || root.consciousness || root.nivel_consciencia || null
+    const structure = root.estrutura_copy || root.structural_analysis || null
+    const improvements = root.pontos_melhoria || root.improvements || null
+    const angles = root.novos_angulos || root.angles || null
+    // Q&A output varies by node; try common locations
+    const qna = root.qna || root.qa || root['q&a'] || root.response?.text || root.qna_text || null
+    return { consciousness, structure, improvements, angles, qna }
+  }, [resultRoot])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
@@ -317,6 +342,126 @@ export default function LeadPage() {
         {(improvedLead || result) && !isWaiting && (
           <Card className="shadow-sm bg-transparent">
             <CardContent className="space-y-3">
+              {resultRoot && (
+                <div className="space-y-6">
+                  {analysis && (analysis as any).consciousness && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <h2 className="font-medium">Análise Nível de Consciência</h2>
+                      </div>
+                      <div className="text-sm space-y-1">
+                        {(() => {
+                          const c: any = (analysis as any).consciousness
+                          const nivel = c?.nivel_identificado?.nivel ?? c?.nivel_identificado ?? c?.nivel
+                          const descricao = c?.nivel_identificado?.descricao ?? c?.descricao
+                          const adequacao = c?.adequacao
+                          const justificativa = c?.justificativa || c?.analise || c?.texto || c?.text
+                          return (
+                            <div className="space-y-1">
+                              {(nivel || descricao) && (
+                                <div className="text-muted-foreground">Nível: {descricao || nivel}</div>
+                              )}
+                              {adequacao && (
+                                <div className="text-muted-foreground">Adequação: {adequacao}</div>
+                              )}
+                              {justificativa && (
+                                <div className="whitespace-pre-wrap">{justificativa}</div>
+                              )}
+                            </div>
+                          )
+                        })()}
+                      </div>
+                    </div>
+                  )}
+
+                  {analysis && (analysis as any).structure && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <h2 className="font-medium">Análise Estrutural</h2>
+                      </div>
+                      <div className="text-sm space-y-1">
+                        {(() => {
+                          const s: any = (analysis as any).structure
+                          const framework = s?.framework_usado || s?.framework
+                          const detalhes = s?.analise_detalhada || s?.analise || s?.texto || s?.text
+                          const elementos: string[] = s?.elementos_identificados
+                          return (
+                            <div className="space-y-1">
+                              {framework && (
+                                <div className="text-muted-foreground">Framework: {framework}</div>
+                              )}
+                              {Array.isArray(elementos) && elementos.length > 0 && (
+                                <ul className="list-disc pl-5 text-muted-foreground">
+                                  {elementos.map((el, i) => (
+                                    <li key={i}>{el}</li>
+                                  ))}
+                                </ul>
+                              )}
+                              {detalhes && (
+                                <div className="whitespace-pre-wrap">{detalhes}</div>
+                              )}
+                            </div>
+                          )
+                        })()}
+                      </div>
+                    </div>
+                  )}
+
+                  {analysis && Array.isArray((analysis as any).improvements) && (analysis as any).improvements.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <h2 className="font-medium">5 Pontos de Melhoria</h2>
+                      </div>
+                      <div className="space-y-3">
+                        {((analysis as any).improvements as any[]).slice(0, 5).map((item: any, idx: number) => (
+                          <div key={idx} className="border rounded-md p-3 text-sm">
+                            {item?.problema && (<div><span className="font-medium">Problema:</span> {item.problema}</div>)}
+                            {item?.explicacao && (<div><span className="font-medium">Explicação:</span> {item.explicacao}</div>)}
+                            {item?.solucao && (<div><span className="font-medium">Solução:</span> {item.solucao}</div>)}
+                            {item?.exemplo && (<div><span className="font-medium">Exemplo:</span> {item.exemplo}</div>)}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {analysis && Array.isArray((analysis as any).angles) && (analysis as any).angles.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <h2 className="font-medium">3 Novos Ângulos</h2>
+                      </div>
+                      <div className="space-y-3">
+                        {((analysis as any).angles as any[]).slice(0, 3).map((item: any, idx: number) => (
+                          <div key={idx} className="border rounded-md p-3 text-sm">
+                            {item?.nivel_consciencia && (
+                              <div className="text-muted-foreground">Nível: {item.nivel_consciencia}</div>
+                            )}
+                            {item?.headline && (
+                              <div><span className="font-medium">Headline:</span> {item.headline}</div>
+                            )}
+                            {item?.lead && (
+                              <div className="whitespace-pre-wrap"><span className="font-medium">Lead:</span> {item.lead}</div>
+                            )}
+                            {item?.justificativa && (
+                              <div className="whitespace-pre-wrap"><span className="font-medium">Justificativa:</span> {item.justificativa}</div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {analysis && (analysis as any).qna && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <h2 className="font-medium">Q&A Chain</h2>
+                      </div>
+                      <div className="text-sm whitespace-pre-wrap">{(analysis as any).qna}</div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {improvedLead && (
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
