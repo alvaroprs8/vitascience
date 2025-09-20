@@ -28,8 +28,9 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased dark`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <div className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-white to-slate-50" />
         <IgniterProvider>
           {children}
         </IgniterProvider>

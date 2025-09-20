@@ -305,16 +305,16 @@ export default function LeadPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background/50 py-8">
+    <div className="min-h-screen bg-gradient-to-b from-white to-slate-50 py-8">
       <div className="container max-w-4xl mx-auto space-y-6 px-4 sm:px-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-3">
-            <div className="bg-primary/10 p-2 rounded-lg">
-              <FileText className="h-6 w-6 text-primary" />
+            <div className="bg-slate-100 p-2 rounded-lg">
+              <FileText className="h-6 w-6 text-slate-700" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">Análise de Lead</h1>
-              <p className="text-sm text-muted-foreground">Otimize sua lead com análise baseada em Eugene Schwartz</p>
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900">Análise de Lead</h1>
+              <p className="text-sm text-slate-600">Otimize sua lead com análise baseada em Eugene Schwartz</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -329,7 +329,7 @@ export default function LeadPage() {
                   Histórico
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[420px] sm:w-[480px]">
+                <SheetContent side="right" className="w-[420px] sm:w-[480px] bg-white">
                 <SheetHeader>
                   <SheetTitle className="flex items-center gap-2">
                     <History className="h-5 w-5" />
@@ -340,13 +340,13 @@ export default function LeadPage() {
                 <ScrollArea className="h-[calc(100vh-120px)] pr-4">
                   {history.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-40 text-center">
-                      <Info className="h-10 w-10 text-muted-foreground mb-2 opacity-20" />
-                      <p className="text-sm text-muted-foreground">Nenhuma análise encontrada.</p>
+                      <Info className="h-10 w-10 text-slate-400 mb-2 opacity-80" />
+                      <p className="text-sm text-slate-500">Nenhuma análise encontrada.</p>
                     </div>
                   ) : (
                     <div className="space-y-3">
                       {history.map((h) => (
-                        <Card key={h.id} className="overflow-hidden">
+                        <Card key={h.id} className="overflow-hidden bg-white border-slate-200">
                           <CardContent className="p-3">
                             <div className="flex items-center justify-between gap-2">
                               <div className="min-w-0 flex-1">
@@ -391,7 +391,7 @@ export default function LeadPage() {
         </div>
 
         {configured === false && (
-          <div className="bg-destructive/10 border border-destructive/30 text-destructive rounded-lg p-4 mb-6 flex items-center gap-3">
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 mb-6 flex items-center gap-3">
             <Info className="h-5 w-5 shrink-0" />
             <p className="text-sm">
               Variável de ambiente <code className="bg-background/80 px-1 py-0.5 rounded">N8N_WEBHOOK_URL</code> não configurada. Defina-a na Vercel.
@@ -399,7 +399,7 @@ export default function LeadPage() {
           </div>
         )}
 
-        <Card className="shadow-sm">
+        <Card className="shadow-sm bg-white border-slate-200">
           <CardHeader className="pb-3">
             <CardTitle className="text-xl">Enviar Lead para Análise</CardTitle>
             <CardDescription>
@@ -454,8 +454,8 @@ export default function LeadPage() {
                   placeholder="Cole aqui as primeiras páginas (Lead) da VSL..."
                   className="min-h-48 resize-y"
                 />
-                <div className="text-xs text-muted-foreground flex items-center gap-1.5">
-                  <Info className="h-3.5 w-3.5" />
+                <div className="text-xs text-slate-500 flex items-center gap-1.5">
+                  <Info className="h-3.5 w-3.5 text-slate-400" />
                   Dica: você pode enviar um arquivo ou colar o texto diretamente.
                 </div>
               </div>
@@ -473,16 +473,16 @@ export default function LeadPage() {
                   className="min-h-24 resize-y font-mono text-sm"
                 />
                 {parsedMetadata === '__INVALID__' && (
-                  <span className="text-xs text-destructive flex items-center gap-1.5">
-                    <Info className="h-3.5 w-3.5" />
+                  <span className="text-xs text-red-700 flex items-center gap-1.5">
+                    <Info className="h-3.5 w-3.5 text-red-500" />
                     JSON inválido. Verifique a formatação.
                   </span>
                 )}
               </div>
 
               {error && (
-                <div className="bg-destructive/10 text-destructive rounded-md px-3 py-2 text-sm flex items-center gap-2">
-                  <Info className="h-4 w-4 shrink-0" />
+                <div className="bg-red-50 text-red-700 rounded-md px-3 py-2 text-sm flex items-center gap-2">
+                  <Info className="h-4 w-4 shrink-0 text-red-500" />
                   {error}
                 </div>
               )}
@@ -536,14 +536,14 @@ export default function LeadPage() {
         </Card>
 
         {isWaiting && (
-          <Card className="shadow-sm border-primary/20 bg-primary/5">
+          <Card className="shadow-sm border-blue-200 bg-blue-50">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                  <div className="h-8 w-8 rounded-full border-2 border-blue-600 border-t-transparent animate-spin" />
                   <div>
                     <h3 className="font-medium">Processando no n8n...</h3>
-                    <p className="text-xs text-muted-foreground">Sua análise está sendo gerada</p>
+                    <p className="text-xs text-slate-600">Sua análise está sendo gerada</p>
                   </div>
                 </div>
                 <Badge variant="outline" className="text-xs">Atualizando automaticamente</Badge>
@@ -553,10 +553,10 @@ export default function LeadPage() {
         )}
 
         {(improvedLead || result) && !isWaiting && (
-          <Card className="shadow-sm">
+          <Card className="shadow-sm bg-white border-slate-200">
             <CardContent className="pt-6">
               <Tabs defaultValue="resumo" className="w-full">
-                <TabsList className="flex flex-wrap gap-1 mb-6 h-auto p-1">
+                <TabsList className="flex flex-wrap gap-1 mb-6 h-auto p-1 bg-slate-100 rounded-md">
                   <TabsTrigger value="resumo" className="flex items-center gap-1.5 h-9">
                     <Info className="h-4 w-4" />
                     Resumo
@@ -631,7 +631,7 @@ export default function LeadPage() {
                   </div>
                   <Separator />
                   <div className="grid gap-4 sm:grid-cols-3">
-                    <Card className="bg-background/50">
+                    <Card className="bg-white border-slate-200">
                       <CardContent className="pt-6">
                         <div className="flex items-center justify-between mb-2">
                           <h3 className="text-sm font-medium text-muted-foreground">Melhorias</h3>
@@ -640,7 +640,7 @@ export default function LeadPage() {
                         <p className="text-2xl font-bold">{summary.improvementsCount}</p>
                       </CardContent>
                     </Card>
-                    <Card className="bg-background/50">
+                    <Card className="bg-white border-slate-200">
                       <CardContent className="pt-6">
                         <div className="flex items-center justify-between mb-2">
                           <h3 className="text-sm font-medium text-muted-foreground">Ângulos</h3>
@@ -649,7 +649,7 @@ export default function LeadPage() {
                         <p className="text-2xl font-bold">{summary.anglesCount}</p>
                       </CardContent>
                     </Card>
-                    <Card className="bg-background/50">
+                    <Card className="bg-white border-slate-200">
                       <CardContent className="pt-6">
                         <div className="flex items-center justify-between mb-2">
                           <h3 className="text-sm font-medium text-muted-foreground">Q&A</h3>
@@ -685,7 +685,7 @@ export default function LeadPage() {
                             )}
                           </div>
                           {justificativa && (
-                            <Card className="bg-background/50">
+                            <Card className="bg-white border-slate-200">
                               <CardContent className="pt-6 text-sm whitespace-pre-wrap">
                                 {justificativa}
                               </CardContent>
@@ -715,7 +715,7 @@ export default function LeadPage() {
                             )}
                           </div>
                           {Array.isArray(elementos) && elementos.length > 0 && (
-                            <Card className="bg-background/50">
+                            <Card className="bg-white border-slate-200">
                               <CardContent className="pt-6">
                                 <h3 className="text-sm font-medium mb-3">Elementos Identificados</h3>
                                 <ul className="list-disc pl-5 text-muted-foreground text-sm space-y-1">
@@ -778,7 +778,7 @@ export default function LeadPage() {
                 {Array.isArray((analysis as any).angles) && (analysis as any).angles.length > 0 && (
                   <TabsContent value="angulos" className="grid gap-4 sm:grid-cols-3">
                     {((analysis as any).angles as any[]).slice(0, 3).map((item: any, idx: number) => (
-                      <Card key={idx} className="overflow-hidden">
+                      <Card key={idx} className="overflow-hidden bg-white border-slate-200">
                         <CardHeader className="pb-2 pt-4 px-4">
                           {item?.nivel_consciencia && (
                             <Badge variant="outline" className="mb-1 w-fit">
@@ -796,8 +796,8 @@ export default function LeadPage() {
                             </div>
                           )}
                           {item?.justificativa && (
-                            <div className="whitespace-pre-wrap text-muted-foreground">
-                              <span className="font-medium text-foreground">Justificativa:</span> {item.justificativa}
+                            <div className="whitespace-pre-wrap text-slate-600">
+                              <span className="font-medium text-slate-900">Justificativa:</span> {item.justificativa}
                             </div>
                           )}
                         </CardContent>
@@ -808,7 +808,7 @@ export default function LeadPage() {
 
                 {(analysis as any).qna && (
                   <TabsContent value="qna">
-                    <Card className="bg-background/50">
+                    <Card className="bg-white border-slate-200">
                       <CardContent className="pt-6">
                         <ScrollArea className="h-[400px] pr-4">
                           <div className="text-sm whitespace-pre-wrap">
@@ -832,7 +832,7 @@ export default function LeadPage() {
                         Baixar .txt
                       </Button>
                   </div>
-                    <Card className="bg-background/50">
+                    <Card className="bg-white border-slate-200">
                       <CardContent className="pt-6">
                   <Textarea
                     value={improvedLead}

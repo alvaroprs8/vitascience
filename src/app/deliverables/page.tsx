@@ -55,20 +55,20 @@ export default function DeliverablesPage() {
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
       <header className="mb-10">
-        <h1 className="text-3xl font-semibold tracking-tight">Entregáveis — Clone Digital Eugene Schwartz</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <h1 className="text-3xl font-semibold tracking-tight text-slate-900">Entregáveis — Clone Digital Eugene Schwartz</h1>
+        <p className="mt-2 text-sm text-slate-600">
           Abaixo você encontra todos os artefatos do teste (documentos, diagrama, workflow n8n, schema de banco e validações), além de links rápidos para executar e validar.
         </p>
       </header>
 
       <section className="mb-8">
-        <h2 className="text-xl font-medium mb-3">Acesso Rápido</h2>
+        <h2 className="text-xl font-medium mb-3 text-slate-900">Acesso Rápido</h2>
         <div className="flex flex-wrap gap-3">
           {quickLinks.map((l) => (
             <a
               key={l.href}
               href={l.href}
-              className="inline-flex items-center rounded-md border px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
+              className="inline-flex items-center rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm hover:bg-slate-50"
             >
               {l.label}
             </a>
@@ -77,13 +77,13 @@ export default function DeliverablesPage() {
       </section>
 
       <section className="mb-8">
-        <h2 className="text-xl font-medium mb-3">APIs</h2>
+        <h2 className="text-xl font-medium mb-3 text-slate-900">APIs</h2>
         <div className="flex flex-wrap gap-3">
           {apiLinks.map((l) => (
             <a
               key={l.href}
               href={l.href}
-              className="inline-flex items-center rounded-md border px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
+              className="inline-flex items-center rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm hover:bg-slate-50"
             >
               {l.label}
             </a>
@@ -92,23 +92,23 @@ export default function DeliverablesPage() {
       </section>
 
       <section>
-        <h2 className="text-xl font-medium mb-4">Artefatos</h2>
+        <h2 className="text-xl font-medium mb-4 text-slate-900">Artefatos</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           {items.map((it) => (
-            <article key={it.title} className="rounded-lg border p-4">
-              <h3 className="text-base font-semibold leading-none mb-1">{it.title}</h3>
-              <p className="text-sm text-muted-foreground mb-3">{it.description}</p>
+            <article key={it.title} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
+              <h3 className="text-base font-semibold leading-none mb-1 text-slate-900">{it.title}</h3>
+              <p className="text-sm text-slate-600 mb-3">{it.description}</p>
               <div className="flex gap-2">
                 <a
                   href={it.href}
-                  className="inline-flex items-center rounded-md border px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
+                  className="inline-flex items-center rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm hover:bg-slate-50"
                 >
                   Abrir
                 </a>
                 <a
                   href={it.href}
                   download
-                  className="inline-flex items-center rounded-md border px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
+                  className="inline-flex items-center rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm hover:bg-slate-50"
                 >
                   Download
                 </a>
@@ -118,7 +118,7 @@ export default function DeliverablesPage() {
         </div>
       </section>
 
-      <footer className="mt-10 text-xs text-muted-foreground">
+      <footer className="mt-10 text-xs text-slate-500">
         <p>
           Observação: os arquivos acima ficam em <code>/public/deliverables/</code>. Substitua pelos definitivos conforme for finalizando.
         </p>
