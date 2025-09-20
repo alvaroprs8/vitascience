@@ -15,13 +15,13 @@ export default async function ConcepcaoPage() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl">
-      <div className="mb-6 flex items-center justify-between gap-3">
+    <div className="mx-auto max-w-[1200px]">
+      <header className="mb-6 flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Documento de concepção</h1>
         <a href="/planejamento" className="text-sm text-slate-600 hover:underline">Voltar</a>
-      </div>
+      </header>
 
-      <article className="prose prose-slate max-w-none">
+      <article className="prose prose-slate max-w-none rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
         <ReactMarkdown remarkPlugins={[remarkGfm]}>
           {content}
         </ReactMarkdown>
