@@ -46,6 +46,7 @@ export default function LeadPage() {
   const [showJson, setShowJson] = useState(false)
   const [correlationId, setCorrelationId] = useState<string | null>(null)
   const [isWaiting, setIsWaiting] = useState(false)
+  const [showForm, setShowForm] = useState(false)
 
   useEffect(() => {
     fetch('/api/submit-lead').then(async (res) => {
@@ -390,12 +391,29 @@ export default function LeadPage() {
 
         <Card className="shadow-sm bg-white border-slate-200">
           <CardHeader className="pb-3">
-            <CardTitle className="text-xl">Enviar Lead para Análise</CardTitle>
-            <CardDescription>
-              Insira o texto da lead para receber uma análise detalhada e sugestões de melhoria
-            </CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-xl">Enviar Lead para Análise</CardTitle>
+                <CardDescription>
+                  Insira o texto da lead para receber uma análise detalhada e sugestões de melhoria
+                </CardDescription>
+              </div>
+              <Button size="sm" variant="outline" onClick={() => setShowForm((v) => !v)} className="gap-2">
+                {showForm ? (
+                  <>
+                    <ChevronRight className="h-4 w-4 rotate-90" />
+                    Ocultar
+                  </>
+                ) : (
+                  <>
+                    <ChevronRight className="h-4 w-4" />
+                    Mostrar
+                  </>
+                )}
+              </Button>
+            </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className={showForm ? '' : 'hidden'}>
             <form className="space-y-5" onSubmit={handleSubmit}>
               <div className="grid gap-2">
                 <Label htmlFor="title" className="flex items-center gap-1.5">
@@ -574,7 +592,6 @@ export default function LeadPage() {
                     </TabsTrigger>
                   )}
                 </TabsList>
-
                 <TabsContent value="resumo" className="space-y-4">
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge variant="secondary" className="flex items-center gap-1">
