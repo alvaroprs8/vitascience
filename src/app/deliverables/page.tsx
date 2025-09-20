@@ -62,31 +62,10 @@ export default function DeliverablesPage() {
               Artefatos do teste (documentos, diagrama, workflow n8n, schema de banco e validações), além de links rápidos para executar e validar.
             </p>
           </div>
-          <a
-            href="/lead"
-            className="inline-flex h-9 items-center rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 shadow-sm hover:bg-slate-50"
-          >
-            Abrir UI de Envio
-          </a>
         </div>
       </div>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-medium mb-3 text-slate-900">Acesso Rápido</h2>
-        <div className="flex flex-wrap gap-3">
-          {quickLinks.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              className="inline-flex items-center rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm hover:bg-slate-50"
-            >
-              {l.label}
-            </a>
-          ))}
-        </div>
-      </section>
-
-      <section className="mb-8">
+      <section id="apis" className="mb-8">
         <h2 className="text-xl font-medium mb-3 text-slate-900">APIs</h2>
         <div className="flex flex-wrap gap-3">
           {apiLinks.map((l) => (
@@ -101,7 +80,7 @@ export default function DeliverablesPage() {
         </div>
       </section>
 
-      <section>
+      <section id="artefatos">
         <h2 className="text-xl font-medium mb-4 text-slate-900">Artefatos</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((it) => (
