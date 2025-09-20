@@ -1,4 +1,4 @@
-import { BentoGrid, BentoCard } from "@/components/ui/bento-grid"
+import IntegrationsSection, { IntegrationCard } from "@/components/integrations-component"
 import { Button } from "@/components/ui/button"
 import { FileTextIcon, CodeIcon, DownloadIcon } from "@radix-ui/react-icons"
 
@@ -58,20 +58,41 @@ export default function DeliverablesPage() {
 
   return (
     <div className="mx-auto max-w-6xl">
-      <div className="mb-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Entregáveis — Clone Digital Eugene Schwartz</h1>
-            <p className="mt-1 text-sm text-slate-600">
-              Artefatos do teste (documentos, diagrama, workflow n8n, schema de banco e validações), além de links rápidos para executar e validar.
-            </p>
-          </div>
-        </div>
+      <div className="py-10 text-center">
+        <h1 className="text-3xl font-semibold tracking-tight text-slate-900">Eugene Schwartz</h1>
       </div>
 
-      <APIsSection apiLinks={apiLinks} />
+      <section className="mb-10">
+        <div className="mx-auto max-w-5xl px-6">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {apiLinks.map((l) => (
+              <IntegrationCard key={l.href} title={l.label} description="Endpoint da API" actions={[{ label: 'Abrir', href: l.href }]}>
+                <CodeIcon className="size-10" />
+              </IntegrationCard>
+            ))}
+          </div>
+        </div>
+      </section>
 
-      <ArtefatosSection items={items} />
+      <section>
+        <div className="mx-auto max-w-5xl px-6">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {items.map((it) => (
+              <IntegrationCard
+                key={it.title}
+                title={it.title}
+                description={it.description}
+                actions={[
+                  { label: 'Abrir', href: it.href },
+                  { label: 'Download', href: it.href, download: true },
+                ]}
+              >
+                <FileTextIcon className="size-10" />
+              </IntegrationCard>
+            ))}
+          </div>
+        </div>
+      </section>
 
       <footer className="mt-10 text-xs text-slate-500">
         <p>
@@ -81,65 +102,3 @@ export default function DeliverablesPage() {
     </div>
   )
 }
-
-
-function APIsSection({
-  apiLinks,
-}: {
-  apiLinks: Array<{ label: string; href: string }>
-}) {
-  return (
-    <section id="apis" className="mb-8">
-      <h2 className="text-xl font-medium mb-3 text-slate-900">APIs</h2>
-      <BentoGrid className="auto-rows-[16rem] grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-        {apiLinks.map((l) => (
-          <BentoCard
-            key={l.href}
-            name={l.label}
-            description="Endpoints para validação e execução do fluxo"
-            href={l.href}
-            cta="Abrir"
-            Icon={CodeIcon}
-            className="col-span-1"
-            background={null}
-          />
-        ))}
-      </BentoGrid>
-    </section>
-  )
-}
-
-function ArtefatosSection({
-  items,
-}: {
-  items: Array<{ title: string; description: string; href: string }>
-}) {
-  return (
-    <section id="artefatos">
-      <h2 className="text-xl font-medium mb-4 text-slate-900">Artefatos</h2>
-      <BentoGrid className="auto-rows-[18rem] grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-        {items.map((it) => (
-          <BentoCard
-            key={it.title}
-            name={it.title}
-            description={it.description}
-            href={it.href}
-            cta="Abrir"
-            Icon={FileTextIcon}
-            className="col-span-1"
-            background={null}
-            extraActions={
-              <Button variant="ghost" size="sm" asChild>
-                <a href={it.href} download>
-                  Download
-                  <DownloadIcon className="ml-2 h-4 w-4" />
-                </a>
-              </Button>
-            }
-          />
-        ))}
-      </BentoGrid>
-    </section>
-  )
-}
-
