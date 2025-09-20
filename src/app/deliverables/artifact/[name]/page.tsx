@@ -67,7 +67,8 @@ export default async function ArtifactPage({ params }: { params: Promise<{ name:
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
-                  code({ inline, className, children, ...props }) {
+                  code(componentProps) {
+                    const { inline, className, children, ...props } = componentProps as any
                     if (inline) {
                       return (
                         <code className="px-1 py-0.5 rounded bg-slate-100" {...props}>
