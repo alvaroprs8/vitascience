@@ -1,5 +1,8 @@
 export default function PortfolioVitascience() {
-  const tasks = [
+  const tasks: Array<{
+    section: string
+    items: Array<{ name: string; done: boolean; href?: string }>
+  }> = [
     {
       section: "Planejamento e Pesquisa",
       items: [
@@ -40,7 +43,7 @@ export default function PortfolioVitascience() {
         { name: "Mínimo 3 novos ângulos (headlines e justificativas)", done: true },
       ],
     },
-  ] as const
+  ]
 
   const computeSectionProgress = (items: ReadonlyArray<{ done: boolean }>) => {
     const total = items.length
