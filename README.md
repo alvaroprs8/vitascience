@@ -153,6 +153,44 @@ src/
 -   `npm run start`: Starts the production server.
 -   `npm run lint`: Runs the linter.
 
+## Lead Submission UI (Vitascience)
+
+This app includes a minimal interface to submit VSL leads and trigger the n8n workflow that runs the Eugene Schwartz clone.
+
+### Pages
+
+- `/lead`: Form to paste or upload the Lead text, optional title and metadata (JSON). Submits to `/api/submit-lead` and displays the JSON analysis response.
+
+### API
+
+- `POST /api/submit-lead`: Proxies the request body to your n8n webhook URL set via `N8N_WEBHOOK_URL`. If `N8N_WEBHOOK_AUTH` is set, it is forwarded as the `Authorization` header for the n8n webhook.
+
+Request body example:
+
+```json
+{
+  "lead": "Aqui vai a lead da VSL...",
+  "title": "Lead VSL Vitascience",
+  "metadata": { "idioma": "pt-BR", "produto": "Suplemento X" }
+}
+```
+
+### Environment Variables
+
+Set these in Vercel Project Settings → Environment Variables:
+
+- `N8N_WEBHOOK_URL`: The full URL of the n8n webhook trigger (e.g., `https://n8n.example.com/webhook/abcd-efgh`)
+- `N8N_WEBHOOK_AUTH` (optional): If your webhook requires auth, e.g., `Bearer xxxxx` or a custom header value.
+
+On Vercel, redeploy after adding variables. The page `/lead` will warn if `N8N_WEBHOOK_URL` is not configured.
+
+### Deploy on Vercel
+
+1. Push this repo to GitHub.
+2. Import into Vercel and choose the Next.js framework.
+3. Add the environment variables above in Vercel.
+4. Deploy. After deploy, open the app and navigate to `/lead`.
+
 ## Further Learning
 
 To learn more about Igniter.js and its powerful features, check out the official documentation:

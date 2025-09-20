@@ -17,6 +17,12 @@ export default function Home() {
           </div>
 
           <div className="flex items-center space-x-4">
+            <Button variant="outline" className="bg-transparent rounded-full !px-5 uppercase font-mono h-6" asChild>
+              <a href="/lead">
+                <span className="opacity-60 text-[10px]">Enviar Lead</span>
+                <ArrowUpRight className="size-3" />
+              </a>
+            </Button>
             <a href="https://github.com/felipebarcelospro/igniter-js" target="_blank">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                 <path
