@@ -1,0 +1,30 @@
+{
+  "status": "ready",
+  "correlationId": "SAMPLE-123",
+  "receivedAt": 1732137600000,
+  "data": {
+    "analise_nivel_consciencia": {
+      "nivel_identificado": { "nivel": 3, "descricao": "Consciente da Solução" },
+      "justificativa": "O texto apresenta a promessa e descreve como a solução atua...",
+      "adequacao": "Adequada"
+    },
+    "estrutura_copy": {
+      "framework_usado": "AIDA",
+      "elementos_identificados": ["Headline principal","Lead de abertura","Promessa central","Prova social","Call to action"],
+      "analise_detalhada": "Hook forte, big idea clara, mecanismo apresentado..."
+    },
+    "pontos_melhoria": [
+      {"problema":"Excesso de generalidades","explicacao":"Baixa especificidade reduz credibilidade","solucao":"Adicionar números e nomes","exemplo":"Substituir 'centenas' por '237 pessoas'"},
+      {"problema":"Mecanismo pouco claro","explicacao":"Sem clareza do 'como'","solucao":"Detalhar mecanismo único","exemplo":"Explicar em 2 frases o processo bioquímico"},
+      {"problema":"Prova fraca","explicacao":"Faltam evidências concretas","solucao":"Inserir estudo/estatística","exemplo":"Citar estudo com N=120 participantes"},
+      {"problema":"Momentum irregular","explicacao":"Transições não puxam leitura","solucao":"Reescrever pontes entre parágrafos","exemplo":"Terminar frases criando curiosidade"},
+      {"problema":"Promessa dispersa","explicacao":"Big Idea não domina","solucao":"Unificar promessa central","exemplo":"Condençar a promessa em 12 palavras"}
+    ],
+    "novos_angulos": [
+      {"nivel_consciencia":"Consciente da Solução","headline":"A fórmula que reativa seu metabolismo em 23 minutos","lead":"Texto...","justificativa":"Baseado em solução explicitada"},
+      {"nivel_consciencia":"Consciente do Problema","headline":"Por que comer menos engorda depois dos 40","lead":"Texto...","justificativa":"Agita o problema"},
+      {"nivel_consciencia":"Consciente do Produto","headline":"O protocolo de 15s que 237 mulheres testaram","lead":"Texto...","justificativa":"Ancorado em prova/social"}
+    ]
+  },
+  "improvedLead": "Texto reescrito da lead..."
+}
