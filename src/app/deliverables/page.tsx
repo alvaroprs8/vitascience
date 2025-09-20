@@ -1,3 +1,7 @@
+import { BentoGrid, BentoCard } from "@/components/ui/bento-grid"
+import { Button } from "@/components/ui/button"
+import { FileTextIcon, CodeIcon, DownloadIcon } from "@radix-ui/react-icons"
+
 export default function DeliverablesPage() {
   const items: Array<{
     title: string
@@ -65,47 +69,9 @@ export default function DeliverablesPage() {
         </div>
       </div>
 
-      <section id="apis" className="mb-8">
-        <h2 className="text-xl font-medium mb-3 text-slate-900">APIs</h2>
-        <div className="flex flex-wrap gap-3">
-          {apiLinks.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              className="inline-flex items-center rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm hover:bg-slate-50"
-            >
-              {l.label}
-            </a>
-          ))}
-        </div>
-      </section>
+      <APIsSection apiLinks={apiLinks} />
 
-      <section id="artefatos">
-        <h2 className="text-xl font-medium mb-4 text-slate-900">Artefatos</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((it) => (
-            <article key={it.title} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
-              <h3 className="text-base font-semibold leading-none mb-1 text-slate-900">{it.title}</h3>
-              <p className="text-sm text-slate-600 mb-3">{it.description}</p>
-              <div className="flex gap-2">
-                <a
-                  href={it.href}
-                  className="inline-flex items-center rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm hover:bg-slate-50"
-                >
-                  Abrir
-                </a>
-                <a
-                  href={it.href}
-                  download
-                  className="inline-flex items-center rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm hover:bg-slate-50"
-                >
-                  Download
-                </a>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
+      <ArtefatosSection items={items} />
 
       <footer className="mt-10 text-xs text-slate-500">
         <p>
@@ -116,4 +82,68 @@ export default function DeliverablesPage() {
   )
 }
 
+
+function APIsSection({
+  apiLinks,
+}: {
+  apiLinks: Array<{ label: string; href: string }>
+}) {
+  return (
+    <section id="apis" className="mb-8">
+      <h2 className="text-xl font-medium mb-3 text-slate-900">APIs</h2>
+      <BentoGrid className="auto-rows-[16rem] grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        {apiLinks.map((l) => (
+          <BentoCard
+            key={l.href}
+            name={l.label}
+            description="Endpoints para validação e execução do fluxo"
+            href={l.href}
+            cta="Abrir"
+            Icon={CodeIcon}
+            className="col-span-1"
+            background={
+              <div className="absolute inset-0 -z-10 bg-gradient-to-br from-sky-50 to-indigo-50 dark:from-slate-900 dark:to-slate-800" />
+            }
+          />
+        ))}
+      </BentoGrid>
+    </section>
+  )
+}
+
+function ArtefatosSection({
+  items,
+}: {
+  items: Array<{ title: string; description: string; href: string }>
+}) {
+  return (
+    <section id="artefatos">
+      <h2 className="text-xl font-medium mb-4 text-slate-900">Artefatos</h2>
+      <BentoGrid className="auto-rows-[18rem] grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        {items.map((it) => (
+          <BentoCard
+            key={it.title}
+            name={it.title}
+            description={it.description}
+            href={it.href}
+            cta="Abrir"
+            Icon={FileTextIcon}
+            className="col-span-1"
+            background={
+              <div className="absolute inset-0 -z-10 bg-gradient-to-br from-amber-50 to-rose-50 dark:from-slate-900 dark:to-slate-800" />
+            }
+            extraActions={
+              <Button variant="ghost" size="sm" asChild>
+                <a href={it.href} download>
+                  Download
+                  <DownloadIcon className="ml-2 h-4 w-4" />
+                </a>
+              </Button>
+            }
+          />
+        ))}
+      </BentoGrid>
+    </section>
+  )
+}
 
