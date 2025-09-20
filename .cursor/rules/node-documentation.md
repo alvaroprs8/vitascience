@@ -21,7 +21,7 @@
 14. [Vector Store Retriever](#14-vector-store-retriever---buscar-conhecimento-eugene)
 15. [Pinecone Read - Recuperar Princípios](#15-pinecone-read---recuperar-princípios)
 16. [OpenAI Embeddings - Query](#16-openai-embeddings---query)
-17. [OpenAI GPT-4 - Motor de Análise](#17-openai-gpt-4---motor-de-análise)
+17. [OpenAI GPT-5 - Motor de Análise](#17-openai-gpt-5---motor-de-análise)
 18. [Gerar 5 Pontos de Melhoria](#18-gerar-5-pontos-de-melhoria)
 19. [Criar 3 Novos Ângulos](#19-criar-3-novos-ângulos)
 20. [Formatar Resposta JSON Final](#20-formatar-resposta-json-final)
@@ -389,7 +389,7 @@ return [{
     - Problemas na abordagem`,
     
     "temperature": 0.3,  // Baixa para consistência
-    "maxTokens": 1000
+    "maxCompletionTokens": 1000
   }
 }
 ```
@@ -426,7 +426,7 @@ return [{
     3. Qualidade da execução`,
     
     "temperature": 0.3,
-    "maxTokens": 1000
+    "maxCompletionTokens": 1000
   }
 }
 ```
@@ -452,7 +452,7 @@ return [{
 ```
 
 **Conexões necessárias:**
-- **Language Model:** GPT-4
+- **Language Model:** GPT-5
 - **Retriever:** Vector Store Retriever
 
 ---
@@ -516,30 +516,32 @@ return [{
 
 ---
 
-### 17. OpenAI GPT-4 - Motor de Análise
+### 17. OpenAI GPT-5 - Motor de Análise
 
-**Tipo:** `@n8n/n8n-nodes-langchain.lmChatOpenAi`
+**Tipo:** `@n8n/n8n-nodes-langchain.lmChatOpenAi` (compatível com Responses API)
 
 **Função:** Modelo de linguagem principal que executa todas as análises.
 
-**Configuração:**
+**Configuração (Responses API / GPT‑5):**
 ```javascript
 {
-  "model": "gpt-4-turbo-preview",  // Ou "gpt-4", "gpt-3.5-turbo"
+  "model": "gpt-5",
   "options": {
-    "temperature": 0.3,     // Baixa para consistência
-    "maxTokens": 2000,      // Limite de resposta
-    "topP": 0.9,           // Diversidade controlada
-    "frequencyPenalty": 0,  // Sem penalidade de frequência
-    "presencePenalty": 0    // Sem penalidade de presença
+    "temperature": 0.3,                 // Baixa para consistência
+    "maxCompletionTokens": 2000,        // GPT‑5 usa max_completion_tokens
+    "reasoning": { "effort": "medium" },
+    "text": { "verbosity": "low" },
+    "topP": 0.9,
+    "frequencyPenalty": 0,
+    "presencePenalty": 0
   }
 }
 ```
 
-**Modelos disponíveis e custos:**
-- `gpt-4-turbo`: $0.01/1K tokens (melhor qualidade)
-- `gpt-4`: $0.03/1K tokens
-- `gpt-3.5-turbo`: $0.001/1K tokens (mais econômico)
+**Modelos disponíveis (série GPT‑5):**
+- `gpt-5`: raciocínio complexo, melhor qualidade geral
+- `gpt-5-mini`: custo/latência menores com bom raciocínio
+- `gpt-5-nano`: throughput alto para tarefas simples
 
 **Este node conecta a TODOS os chains de análise**
 
@@ -648,7 +650,7 @@ const response = {
   
   metadata: {
     timestamp: new Date().toISOString(),
-    modelo_usado: "GPT-4 + Eugene Schwartz RAG",
+    modelo_usado: "GPT-5 + Eugene Schwartz RAG",
     versao: "1.0.0"
   },
   
@@ -729,7 +731,7 @@ graph LR
     C -->|main paralelo| E[Estrutura]
     C -->|main paralelo| F[Q&A Chain]
     
-    G[GPT-4] -->|ai_languageModel| D
+    G[GPT-5] -->|ai_languageModel| D
     G -->|ai_languageModel| E
     G -->|ai_languageModel| H[Melhorias]
     G -->|ai_languageModel| I[Ângulos]
@@ -778,7 +780,7 @@ graph LR
 |------|---------|-------|--------|
 | Webhook | Latência | <100ms | >500ms |
 | Embeddings | Tokens/seg | >1000 | <500 |
-| GPT-4 | Tempo resposta | <5s | >15s |
+| GPT-5 | Tempo resposta | <5s | >15s |
 | Pinecone | Query time | <200ms | >1s |
 | Total workflow | Execução | <30s | >60s |
 
@@ -786,7 +788,7 @@ graph LR
 
 1. **Cache de embeddings**: Reutilizar vetores frequentes
 2. **Batch processing**: Processar múltiplas VSLs
-3. **Fallback models**: GPT-3.5 se GPT-4 falhar
+3. **Fallback models**: gpt-5-mini ou gpt-4.1 se gpt-5 falhar
 4. **Retry logic**: Retentar nodes com falha
 5. **Load balancing**: Múltiplas API keys
 
