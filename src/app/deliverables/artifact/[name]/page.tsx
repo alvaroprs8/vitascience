@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import Highlight, { defaultProps } from 'prism-react-renderer'
-import dracula from 'prism-react-renderer/themes/dracula'
 
 type ArtifactInfo = { title: string; filename: string; type: 'md' | 'sql' | 'json' | 'mmd' | 'txt' }
 
@@ -79,7 +78,7 @@ export default async function ArtifactPage({ params }: { params: Promise<{ name:
                       )
                     }
                     return (
-                      <Highlight {...defaultProps} theme={dracula} code={String(children).trim()} language={(match?.[1] as any) || 'markdown'}>
+                      <Highlight {...defaultProps} code={String(children).trim()} language={(match?.[1] as any) || 'markdown'}>
                         {({ className: cls, style, tokens, getLineProps, getTokenProps }) => (
                           <pre className={`${cls} rounded-md p-4 overflow-auto`} style={style}>
                             {tokens.map((line, i) => (
