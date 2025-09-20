@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Igniter.js Boilerplate",
-  description: "A customizable boilerplate for Igniter.js applications",
+  title: "Vitascience — Analisador de Leads",
+  description: "Envie e analise Leads de VSL com integração n8n",
 };
 
 export default function RootLayout({
@@ -26,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="pt-BR" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased dark`}
       >
