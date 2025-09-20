@@ -18,6 +18,8 @@ export default function LeadPage() {
   const [configured, setConfigured] = useState<boolean | null>(null)
   const [improvedLead, setImprovedLead] = useState('')
   const [showJson, setShowJson] = useState(false)
+  const [correlationId, setCorrelationId] = useState<string | null>(null)
+  const [isWaiting, setIsWaiting] = useState(false)
 
   useEffect(() => {
     // Check if the backend proxy is configured
@@ -125,15 +127,21 @@ export default function LeadPage() {
         throw new Error(text || 'Falha ao processar a Lead')
       }
 
-      if (contentType.includes('application/json')) {
-        const data = await res.json()
+      const data = contentType.includes('application/json') ? await res.json() : null
+
+      // Async mode: expect { ok: true, correlationId }
+      if (data && data.correlationId) {
+        setCorrelationId(data.correlationId)
+        setIsWaiting(true)
+        // start polling
+        startPolling(data.correlationId)
+        setResult(null)
+        setImprovedLead('')
+      } else if (data) {
+        // Fallback: immediate response with improved content
         setResult(data)
         const improved = extractImprovedLeadFromJson(data)
-        if (typeof improved === 'string') {
-          setImprovedLead(improved)
-        } else {
-          setImprovedLead('')
-        }
+        setImprovedLead(typeof improved === 'string' ? improved : '')
       } else {
         const text = await res.text()
         setResult({ raw: text })
@@ -144,6 +152,36 @@ export default function LeadPage() {
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  const startPolling = (id: string) => {
+    let attempts = 0
+    const maxAttempts = 60 // ~5 min @5s
+    const intervalMs = 5000
+
+    const timer = setInterval(async () => {
+      attempts += 1
+      try {
+        const res = await fetch(`/api/lead/status?id=${encodeURIComponent(id)}`)
+        const contentType = res.headers.get('content-type') || ''
+        if (!res.ok) return
+        const data = contentType.includes('application/json') ? await res.json() : null
+        if (data && (data.status === 'ready' || data.improvedLead)) {
+          setIsWaiting(false)
+          setResult(data)
+          setImprovedLead(typeof data.improvedLead === 'string' && data.improvedLead.trim()
+            ? data.improvedLead
+            : extractImprovedLeadFromJson(data) || '')
+          clearInterval(timer)
+        }
+      } catch {
+        // ignore transient errors
+      }
+      if (attempts >= maxAttempts) {
+        setIsWaiting(false)
+        clearInterval(timer)
+      }
+    }, intervalMs)
   }
 
   const handleFileUpload = async (file: File) => {
@@ -265,7 +303,18 @@ export default function LeadPage() {
           </CardContent>
         </Card>
 
-        {(improvedLead || result) && (
+        {isWaiting && (
+          <Card className="shadow-sm bg-transparent">
+            <CardContent className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h2 className="font-medium">Processando no n8n...</h2>
+                <span className="text-xs text-muted-foreground">Aguarde — atualizando automaticamente</span>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {(improvedLead || result) && !isWaiting && (
           <Card className="shadow-sm bg-transparent">
             <CardContent className="space-y-3">
               {improvedLead && (

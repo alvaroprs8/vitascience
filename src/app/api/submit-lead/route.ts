@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server'
+import { randomUUID } from 'crypto'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,25 +25,34 @@ export async function POST(request: NextRequest) {
     const authHeader = process.env.N8N_WEBHOOK_AUTH
     if (authHeader) headers['Authorization'] = authHeader
 
+    // Async mode: include correlationId and callbackUrl so n8n can call back when ready
+    const baseUrl = process.env.NEXT_PUBLIC_IGNITER_API_URL || 'http://localhost:3000'
+    const correlationId = randomUUID()
+    const callbackUrl = `${baseUrl}/api/lead/callback`
+
+    const asyncPayload = { ...payload, correlationId, callbackUrl }
+
     const n8nResponse = await fetch(n8nUrl, {
       method: 'POST',
-      headers,
-      body: JSON.stringify(payload)
+      headers: {
+        ...headers,
+        ...(process.env.N8N_CALLBACK_SECRET ? { 'X-Callback-Secret': process.env.N8N_CALLBACK_SECRET } : {})
+      },
+      body: JSON.stringify(asyncPayload)
     })
 
-    const contentType = n8nResponse.headers.get('content-type') || ''
-    const status = n8nResponse.status
-
-    if (contentType.includes('application/json')) {
-      const data = await n8nResponse.json()
-      return Response.json(data, { status })
+    // We don't block on n8n processing; return the correlationId immediately
+    if (!n8nResponse.ok) {
+      const contentType = n8nResponse.headers.get('content-type') || ''
+      if (contentType.includes('application/json')) {
+        const data = await n8nResponse.json()
+        return Response.json({ error: data?.error || 'n8n error' }, { status: 502 })
+      }
+      const text = await n8nResponse.text()
+      return Response.json({ error: text || 'n8n error' }, { status: 502 })
     }
 
-    const text = await n8nResponse.text()
-    return new Response(text, {
-      status,
-      headers: { 'Content-Type': contentType || 'text/plain' }
-    })
+    return Response.json({ ok: true, correlationId })
   } catch (error: any) {
     return Response.json({ error: error?.message || 'Unexpected error' }, { status: 500 })
   }
