@@ -8,37 +8,37 @@ export default function DeliverablesPage() {
     {
       title: 'Documento de Concepção',
       description: 'Arquitetura, decisões e trade-offs da solução (Markdown).',
-      href: '/deliverables/CONCEPCAO.md',
+      href: '/deliverables/artifact/concepcao',
     },
     {
       title: 'Diagrama (Mermaid)',
       description: 'Fluxo end-to-end: ingestão RAG, análise no n8n, callback e consumo.',
-      href: '/deliverables/DIAGRAMA.mmd',
+      href: '/deliverables/artifact/diagrama',
     },
     {
       title: 'Documentação dos Prompts',
       description: 'Todos os prompts usados (consciência, estrutura, melhorias, ângulos, agente Eugene).',
-      href: '/deliverables/PROMPTS.md',
+      href: '/deliverables/artifact/prompts',
     },
     {
       title: 'Workflow do n8n (JSON)',
       description: 'Export do workflow para import direto no n8n.',
-      href: '/deliverables/n8n-workflow.json',
+      href: '/deliverables/artifact/n8n',
     },
     {
       title: 'Estrutura do Banco de Dados',
       description: 'DDL da tabela lead_results e índices (PostgreSQL/Supabase).',
-      href: '/deliverables/DB_SCHEMA.sql',
+      href: '/deliverables/artifact/db_schema',
     },
     {
       title: 'Validação e Testes',
       description: 'Análise completa da VSL enviada e critérios de avaliação do clone.',
-      href: '/deliverables/VALIDATION.md',
+      href: '/deliverables/artifact/validation',
     },
     {
       title: 'Link do Loom',
       description: 'Vídeo (5–10 min) demonstrando tudo funcionando.',
-      href: '/deliverables/LOOM.md',
+      href: '/deliverables/artifact/loom',
     },
   ]
 
