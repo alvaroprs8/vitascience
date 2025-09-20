@@ -18,19 +18,17 @@ export function SaaSLayout({ children }: SaaSLayoutProps) {
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-white to-slate-50">
-      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur">
-        <div className="mx-auto max-w-[1400px] px-4 py-3">
-          <div className="flex items-center justify-center">
-            <Dock
-              items={menuItems.map((m) => ({ icon: m.icon, label: m.label, onClick: m.onClick }))}
-              className="w-auto h-16"
-            />
-          </div>
-        </div>
-      </header>
       <main className="mx-auto max-w-[1400px] px-6 py-8 sm:px-8">
         {children}
       </main>
+      <div className="fixed inset-x-0 bottom-4 z-50 flex items-center justify-center pointer-events-none">
+        <div className="pointer-events-auto">
+          <Dock
+            items={menuItems.map((m) => ({ icon: m.icon, label: m.label, onClick: m.onClick }))}
+            className="w-auto h-16"
+          />
+        </div>
+      </div>
     </div>
   )
 }
