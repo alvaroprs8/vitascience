@@ -12,7 +12,6 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Separator } from '@/components/ui/separator'
 import { 
   BarChart3, 
@@ -23,7 +22,6 @@ import {
   Copy, 
   Download, 
   FileText, 
-  History, 
   Home, 
   Info, 
   Lightbulb, 
@@ -312,67 +310,7 @@ export default function LeadPage() {
               <Home className="h-4 w-4 mr-2" />
               Início
             </Button>
-            <Sheet open={historyOpen} onOpenChange={(o) => { setHistoryOpen(o); if (o) loadHistory().catch(() => {}) }}>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <History className="h-4 w-4 mr-2" />
-                  Histórico
-                </Button>
-              </SheetTrigger>
-                <SheetContent side="right" className="w-[420px] sm:w-[480px] bg-white">
-                <SheetHeader>
-                  <SheetTitle className="flex items-center gap-2">
-                    <History className="h-5 w-5" />
-                    Histórico de Análises
-                  </SheetTitle>
-                </SheetHeader>
-                <Separator className="my-4" />
-                <ScrollArea className="h-[calc(100vh-120px)] pr-4">
-                  {history.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-40 text-center">
-                      <Info className="h-10 w-10 text-slate-400 mb-2 opacity-80" />
-                      <p className="text-sm text-slate-500">Nenhuma análise encontrada.</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {history.map((h) => (
-                        <Card key={h.id} className="overflow-hidden bg-white border-slate-200">
-                          <CardContent className="p-3">
-                            <div className="flex items-center justify-between gap-2">
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-center gap-2">
-                                  <div className="font-medium truncate">{h.title || 'Sem título'}</div>
-                                  {h.hasImproved && <Badge variant="outline" className="shrink-0">Lead</Badge>}
-                                </div>
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                                  <Badge variant="secondary" className="text-xs font-normal">
-                                    {h.status}
-                                  </Badge>
-                                  {h.receivedAt && (
-                                    <div className="flex items-center gap-1">
-                                      <Clock className="h-3 w-3" />
-                                      {new Date(h.receivedAt).toLocaleString()}
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                              <Button 
-                                size="sm" 
-                                onClick={() => loadAnalysis(h.id)}
-                                className="shrink-0"
-                              >
-                                <ChevronRight className="h-4 w-4 mr-1" />
-                                Abrir
-                              </Button>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  )}
-                </ScrollArea>
-              </SheetContent>
-            </Sheet>
+            {/* Botão Histórico removido; histórico aparecerá como carrossel abaixo */}
             <Button variant="ghost" size="sm" onClick={handleSignOut}>
               <LogOut className="h-4 w-4 mr-2" />
               Sair
@@ -523,6 +461,51 @@ export default function LeadPage() {
           </CardContent>
         </Card>
 
+        {/* Carrossel de histórico abaixo do formulário */}
+        <div className="overflow-x-auto py-2">
+          <div className="flex gap-4 snap-x snap-mandatory pb-2">
+            {history.length === 0 ? (
+              <div className="text-sm text-slate-500 px-2">Nenhuma análise encontrada.</div>
+            ) : (
+              history.slice(0, 10).map((h) => (
+                <div key={h.id} className="snap-start shrink-0 w-[85%] sm:w-[420px]">
+                  <Card className="overflow-hidden bg-white border-slate-200 h-full">
+                    <CardContent className="p-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <div className="font-medium truncate text-sm">{h.title || 'Sem título'}</div>
+                            {h.hasImproved && <Badge variant="outline" className="shrink-0">Lead</Badge>}
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                            <Badge variant="secondary" className="text-xs font-normal">
+                              {h.status}
+                            </Badge>
+                            {h.receivedAt && (
+                              <div className="flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                {new Date(h.receivedAt).toLocaleString()}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <Button 
+                          size="sm" 
+                          onClick={() => loadAnalysis(h.id)}
+                          className="shrink-0"
+                        >
+                          <ChevronRight className="h-4 w-4 mr-1" />
+                          Abrir
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
         {isWaiting && (
           <Card className="shadow-sm border-blue-200 bg-blue-50">
             <CardContent className="pt-6">
@@ -540,7 +523,8 @@ export default function LeadPage() {
           </Card>
         )}
 
-        {(improvedLead || result) && !isWaiting && (
+        {/* Elemento de análise permanece visível mesmo sem análises */}
+        {!isWaiting && (
           <Card className="shadow-sm bg-white border-slate-200">
             <CardContent className="pt-6">
               <Tabs defaultValue="resumo" className="w-full">
