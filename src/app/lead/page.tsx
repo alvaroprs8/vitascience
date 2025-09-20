@@ -7,8 +7,10 @@ import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
+import { createSupabaseBrowserClient } from '@/lib/supabase/browser'
 
 export default function LeadPage() {
+  const supabase = React.useMemo(() => createSupabaseBrowserClient(), [])
   const [lead, setLead] = useState('')
   const [title, setTitle] = useState('')
   const [metadata, setMetadata] = useState('')
@@ -247,12 +249,20 @@ export default function LeadPage() {
     URL.revokeObjectURL(url)
   }
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    window.location.href = '/auth/login'
+  }
+
   return (
     <div className="min-h-screen py-8">
       <div className="container max-w-3xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-semibold">Enviar Lead da VSL</h1>
-          <a href="/" className="text-sm underline">Voltar</a>
+          <div className="flex items-center gap-2">
+            <a href="/" className="text-sm underline">Voltar</a>
+            <Button variant="outline" size="sm" onClick={handleSignOut}>Sair</Button>
+          </div>
         </div>
 
         {configured === false && (
