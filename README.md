@@ -70,10 +70,10 @@ This starter deeply integrates Igniter.js with the Next.js App Router.
 
 ### 1. The Next.js API Route Handler
 
-The entry point for all API requests is the catch-all route handler located at `src/app/api/[[...all]]/route.ts`. This file uses the `nextRouteHandlerAdapter` from Igniter.js to expose the entire API.
+The entry point for all API requests is the catch-all route handler located at `src/app/api/v1/[[...all]]/route.ts`. This file uses the `nextRouteHandlerAdapter` from Igniter.js to expose the entire API.
 
 ```typescript
-// src/app/api/[[...all]]/route.ts
+// src/app/api/v1/[[...all]]/route.ts
 import { AppRouter } from '@/igniter.router'
 import { nextRouteHandlerAdapter } from '@igniter-js/core/adapters'
 
@@ -163,24 +163,33 @@ This app includes a minimal interface to submit VSL leads and trigger the n8n wo
 
 ### API
 
-- `POST /api/submit-lead`: Proxies the request body to your n8n webhook URL set via `N8N_WEBHOOK_URL`. If `N8N_WEBHOOK_AUTH` is set, it is forwarded as the `Authorization` header for the n8n webhook.
+- `POST /api/submit-lead`: Proxies the request to your n8n webhook URL (`N8N_WEBHOOK_URL`). Envia em formato compatível com o n8n:
 
-Request body example:
+Request body (enviado ao n8n):
 
 ```json
 {
-  "lead": "Aqui vai a lead da VSL...",
+  "vsl_copy": "Aqui vai a lead da VSL...",
   "title": "Lead VSL Vitascience",
-  "metadata": { "idioma": "pt-BR", "produto": "Suplemento X" }
+  "metadata": { "idioma": "pt-BR", "produto": "Suplemento X" },
+  "correlationId": "uuid",
+  "callbackUrl": "https://seu-dominio/api/lead/callback"
 }
 ```
+
+- `POST /api/lead/callback`: Endpoint chamado pelo n8n quando a lead estiver pronta. Requer header `X-Callback-Secret` (configurar `N8N_CALLBACK_SECRET`). Persiste o resultado.
+
+- `GET /api/lead/status?id={correlationId}`: Retorna `{ status: 'pending' | 'ready', improvedLead?, data?, receivedAt? }`.
 
 ### Environment Variables
 
 Set these in Vercel Project Settings → Environment Variables:
 
-- `N8N_WEBHOOK_URL`: The full URL of the n8n webhook trigger (e.g., `https://n8n.example.com/webhook/abcd-efgh`)
+- `N8N_WEBHOOK_URL`: The full URL of the n8n webhook trigger (e.g., `https://n8n.example.com/webhook/abcd-efgh/analyze-vsl-copy`)
 - `N8N_WEBHOOK_AUTH` (optional): If your webhook requires auth, e.g., `Bearer xxxxx` or a custom header value.
+- `N8N_CALLBACK_SECRET`: Secret compartilhado para validar callbacks do n8n.
+- `NEXT_PUBLIC_IGNITER_API_URL`: Base URL pública do app (usada para montar `callbackUrl`).
+- `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY`: Necessárias quando persistindo resultado no Supabase.
 
 On Vercel, redeploy after adding variables. The page `/lead` will warn if `N8N_WEBHOOK_URL` is not configured.
 
