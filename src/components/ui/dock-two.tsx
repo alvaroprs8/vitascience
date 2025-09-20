@@ -83,9 +83,9 @@ const Dock = React.forwardRef<HTMLDivElement, DockProps>(
           )}
         >
           <motion.div
-            initial="initial"
-            animate="animate"
-            variants={floatingAnimation}
+            initial={{ y: 0 }}
+            animate={{ y: [-2, 2, -2] }}
+            transition={{ duration: 4, repeat: Infinity, ease: [0.42, 0, 0.58, 1] }}
             className={cn(
               "flex gap-1 p-2 rounded-2xl",
               isVertical ? "flex-col items-stretch" : "items-center",
