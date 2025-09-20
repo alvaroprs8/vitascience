@@ -109,7 +109,7 @@ export default function DeliverablesPage() {
         </SidebarBody>
 
         <main className="flex-1 px-6 py-8">
-          <section className="mb-8 rounded-xl border bg-gradient-to-r from-blue-50 to-indigo-50 p-6">
+          <section className="mb-8 rounded-xl border bg-gradient-to-r from-emerald-50 to-teal-50 p-6">
             <h1 className="text-3xl font-semibold tracking-tight">Entregáveis — Clone Digital Eugene Schwartz</h1>
             <p className="mt-2 text-sm text-muted-foreground">
               Abaixo você encontra todos os artefatos do teste (documentos, diagrama, workflow n8n, schema de banco e validações), além de links rápidos para executar e validar.
