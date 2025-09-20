@@ -14,7 +14,25 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Separator } from '@/components/ui/separator'
-import { History, LogOut, Upload, Wand2, Loader2, FileDown, Copy, ListChecks, Lightbulb, PanelsTopLeft } from 'lucide-react'
+import { 
+  BarChart3, 
+  Brain, 
+  ChevronRight, 
+  Clock, 
+  Code2, 
+  Copy, 
+  Download, 
+  FileText, 
+  History, 
+  Home, 
+  Info, 
+  Lightbulb, 
+  LogOut, 
+  MessageSquareText, 
+  RotateCcw, 
+  Send, 
+  Upload 
+} from 'lucide-react'
 
 export default function LeadPage() {
   const supabase = React.useMemo(() => createSupabaseBrowserClient(), [])
@@ -31,7 +49,6 @@ export default function LeadPage() {
   const [isWaiting, setIsWaiting] = useState(false)
 
   useEffect(() => {
-    // Check if the backend proxy is configured
     fetch('/api/submit-lead').then(async (res) => {
       try {
         const data = await res.json()
@@ -59,13 +76,11 @@ export default function LeadPage() {
       'lead', 'content', 'texto', 'text', 'output', 'result'
     ]
 
-    // Direct hit on priority keys
     for (const key of priorityKeys) {
       const value = (data as any)?.[key]
       if (typeof value === 'string' && value.trim()) return value
     }
 
-    // Common wrappers (n8n often wraps under data/result)
     const wrappers = ['data', 'result', 'payload']
     for (const w of wrappers) {
       const nested = (data as any)?.[w]
@@ -76,7 +91,6 @@ export default function LeadPage() {
       }
     }
 
-    // Arrays
     if (Array.isArray(data)) {
       for (const item of data) {
         const found = extractImprovedLeadFromJson(item)
@@ -84,7 +98,6 @@ export default function LeadPage() {
       }
     }
 
-    // Fallback: scan any string-valued key that contains likely names
     if (typeof data === 'object') {
       for (const [k, v] of Object.entries(data)) {
         if (typeof v === 'string' && v.trim() && /lead|content|texto|text|improv/i.test(k)) {
@@ -100,13 +113,8 @@ export default function LeadPage() {
     return undefined
   }
 
-  // Safely get the root object containing our analysis fields, regardless of nesting
   const resultRoot = useMemo(() => {
     if (!result) return null
-    // Common shapes:
-    // - Async callback: { status, improvedLead, data: { title, metadata, data: { ...analysis } } }
-    // - Direct: { ...analysis, improvedLead? }
-    // - Wrapped: { data: { ...analysis } }
     const r = result as any
     const candidate = r?.data?.data || r?.data || r
     return candidate || null
@@ -115,12 +123,10 @@ export default function LeadPage() {
   const analysis = useMemo(() => {
     const root = resultRoot as any
     if (!root) return {}
-    // Try several likely keys for each section
     const consciousness = root.analise_nivel_consciencia || root.consciousness || root.nivel_consciencia || null
     const structure = root.estrutura_copy || root.structural_analysis || null
     const improvements = root.pontos_melhoria || root.improvements || null
     const angles = root.novos_angulos || root.angles || null
-    // Q&A output varies by node; try common locations
     const qna = root.qna || root.qa || root['q&a'] || root.response?.text || root.qna_text || null
     return { consciousness, structure, improvements, angles, qna }
   }, [resultRoot])
@@ -175,16 +181,13 @@ export default function LeadPage() {
 
       const data = contentType.includes('application/json') ? await res.json() : null
 
-      // Async mode: expect { ok: true, correlationId }
       if (data && data.correlationId) {
         setCorrelationId(data.correlationId)
         setIsWaiting(true)
-        // start polling
         startPolling(data.correlationId)
         setResult(null)
         setImprovedLead('')
       } else if (data) {
-        // Fallback: immediate response with improved content
         setResult(data)
         const improved = extractImprovedLeadFromJson(data)
         setImprovedLead(typeof improved === 'string' ? improved : '')
@@ -202,7 +205,7 @@ export default function LeadPage() {
 
   const startPolling = (id: string) => {
     let attempts = 0
-    const maxAttempts = 60 // ~5 min @5s
+    const maxAttempts = 60
     const intervalMs = 5000
 
     const timer = setInterval(async () => {
@@ -221,7 +224,6 @@ export default function LeadPage() {
           clearInterval(timer)
         }
       } catch {
-        // ignore transient errors
       }
       if (attempts >= maxAttempts) {
         setIsWaiting(false)
@@ -303,185 +305,364 @@ export default function LeadPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 py-8">
-      <div className="container max-w-3xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-semibold tracking-tight">Analisador de Leads</h1>
-            <p className="text-sm text-muted-foreground">Envie a lead da VSL, acompanhe o processamento e visualize as análises.</p>
+    <div className="min-h-screen bg-background/50 py-8">
+      <div className="container max-w-4xl mx-auto space-y-6 px-4 sm:px-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div className="flex items-center gap-3">
+            <div className="bg-primary/10 p-2 rounded-lg">
+              <FileText className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight">Análise de Lead</h1>
+              <p className="text-sm text-muted-foreground">Otimize sua lead com análise baseada em Eugene Schwartz</p>
+            </div>
           </div>
           <div className="flex items-center gap-2">
-            <a href="/" className="text-sm underline">Voltar</a>
+            <Button variant="outline" size="sm" onClick={() => window.location.href = '/'}>
+              <Home className="h-4 w-4 mr-2" />
+              Início
+            </Button>
             <Sheet open={historyOpen} onOpenChange={(o) => { setHistoryOpen(o); if (o) loadHistory().catch(() => {}) }}>
               <SheetTrigger asChild>
-                <Button variant="outline" size="sm"><History className="mr-2 h-4 w-4" />Histórico</Button>
+                <Button variant="outline" size="sm">
+                  <History className="h-4 w-4 mr-2" />
+                  Histórico
+                </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[420px] sm:w-[480px]">
                 <SheetHeader>
-                  <SheetTitle>Histórico de Análises</SheetTitle>
+                  <SheetTitle className="flex items-center gap-2">
+                    <History className="h-5 w-5" />
+                    Histórico de Análises
+                  </SheetTitle>
                 </SheetHeader>
-                <div className="mt-4 space-y-3">
-                  {history.length === 0 && (
-                    <div className="text-sm text-muted-foreground">Nenhum item encontrado.</div>
+                <Separator className="my-4" />
+                <ScrollArea className="h-[calc(100vh-120px)] pr-4">
+                  {history.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-40 text-center">
+                      <Info className="h-10 w-10 text-muted-foreground mb-2 opacity-20" />
+                      <p className="text-sm text-muted-foreground">Nenhuma análise encontrada.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {history.map((h) => (
+                        <Card key={h.id} className="overflow-hidden">
+                          <CardContent className="p-3">
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-2">
+                                  <div className="font-medium truncate">{h.title || 'Sem título'}</div>
+                                  {h.hasImproved && <Badge variant="outline" className="shrink-0">Lead</Badge>}
+                                </div>
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                                  <Badge variant="secondary" className="text-xs font-normal">
+                                    {h.status}
+                                  </Badge>
+                                  {h.receivedAt && (
+                                    <div className="flex items-center gap-1">
+                                      <Clock className="h-3 w-3" />
+                                      {new Date(h.receivedAt).toLocaleString()}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                              <Button 
+                                size="sm" 
+                                onClick={() => loadAnalysis(h.id)}
+                                className="shrink-0"
+                              >
+                                <ChevronRight className="h-4 w-4 mr-1" />
+                                Abrir
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
                   )}
-                  <div className="space-y-2">
-                    {history.map((h) => (
-                      <div key={h.id} className="border rounded-md p-3 flex items-center justify-between">
-                        <div className="min-w-0">
-                          <div className="text-sm font-medium truncate">{h.title || h.id}</div>
-                          <div className="text-xs text-muted-foreground">
-                            {h.status}{h.receivedAt ? ` • ${new Date(h.receivedAt).toLocaleString()}` : ''}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {h.hasImproved && <Badge variant="secondary">Lead</Badge>}
-                          <Button size="sm" onClick={() => loadAnalysis(h.id)}>
-                            Abrir
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                </ScrollArea>
               </SheetContent>
             </Sheet>
-            <Button variant="outline" size="sm" onClick={handleSignOut}><LogOut className="mr-2 h-4 w-4" />Sair</Button>
+            <Button variant="ghost" size="sm" onClick={handleSignOut}>
+              <LogOut className="h-4 w-4 mr-2" />
+              Sair
+            </Button>
           </div>
         </div>
 
         {configured === false && (
-          <div className="text-sm text-red-500 border border-red-500/30 rounded-md p-3">
-            Variável de ambiente N8N_WEBHOOK_URL não configurada. Defina-a na Vercel.
+          <div className="bg-destructive/10 border border-destructive/30 text-destructive rounded-lg p-4 mb-6 flex items-center gap-3">
+            <Info className="h-5 w-5 shrink-0" />
+            <p className="text-sm">
+              Variável de ambiente <code className="bg-background/80 px-1 py-0.5 rounded">N8N_WEBHOOK_URL</code> não configurada. Defina-a na Vercel.
+            </p>
           </div>
         )}
 
-        <Card className="shadow-sm bg-transparent">
-          <CardHeader className="pb-2">
-            <CardTitle>Enviar Lead</CardTitle>
-            <CardDescription>Você pode colar o texto ou fazer upload de um arquivo; inclua metadata JSON opcional.</CardDescription>
+        <Card className="shadow-sm">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-xl">Enviar Lead para Análise</CardTitle>
+            <CardDescription>
+              Insira o texto da lead para receber uma análise detalhada e sugestões de melhoria
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <form className="space-y-4" onSubmit={handleSubmit}>
+            <form className="space-y-5" onSubmit={handleSubmit}>
               <div className="grid gap-2">
-                <Label htmlFor="title">Título (opcional)</Label>
-                <Input id="title" placeholder="Ex.: Lead VSL Vitascience" value={title} onChange={(e) => setTitle(e.target.value)} />
+                <Label htmlFor="title" className="flex items-center gap-1.5">
+                  <FileText className="h-3.5 w-3.5" />
+                  Título (opcional)
+                </Label>
+                <Input 
+                  id="title" 
+                  placeholder="Ex.: Lead VSL Vitascience" 
+                  value={title} 
+                  onChange={(e) => setTitle(e.target.value)} 
+                />
               </div>
 
               <div className="grid gap-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="lead">Lead da VSL</Label>
-                  <input
-                    type="file"
-                    accept=".txt,.md,.rtf,.html,.docx,.pdf"
-                    onChange={(e) => {
-                      const f = e.target.files?.[0]
-                      if (f) handleFileUpload(f).catch(() => {})
-                    }}
-                  />
+                  <Label htmlFor="lead" className="flex items-center gap-1.5">
+                    <FileText className="h-3.5 w-3.5" />
+                    Lead da VSL
+                  </Label>
+                  <div className="relative">
+                    <Label 
+                      htmlFor="file-upload" 
+                      className="cursor-pointer text-xs text-primary hover:text-primary/80 flex items-center gap-1"
+                    >
+                      <Upload className="h-3.5 w-3.5" />
+                      Carregar arquivo
+                    </Label>
+                    <input
+                      id="file-upload"
+                      type="file"
+                      accept=".txt,.md,.rtf,.html,.docx,.pdf"
+                      className="sr-only"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0]
+                        if (f) handleFileUpload(f).catch(() => {})
+                      }}
+                    />
+                  </div>
                 </div>
                 <Textarea
                   id="lead"
                   value={lead}
                   onChange={(e) => setLead(e.target.value)}
                   placeholder="Cole aqui as primeiras páginas (Lead) da VSL..."
-                  className="min-h-48"
+                  className="min-h-48 resize-y"
                 />
-                <div className="text-xs text-muted-foreground">
+                <div className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  <Info className="h-3.5 w-3.5" />
                   Dica: você pode enviar um arquivo ou colar o texto diretamente.
                 </div>
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="metadata">Metadata (JSON opcional)</Label>
+                <Label htmlFor="metadata" className="flex items-center gap-1.5">
+                  <Code2 className="h-3.5 w-3.5" />
+                  Metadata (JSON opcional)
+                </Label>
                 <Textarea
                   id="metadata"
                   value={metadata}
                   onChange={(e) => setMetadata(e.target.value)}
                   placeholder='{"produto":"Suplemento X","mercado":"Saúde"}'
-                  className="min-h-24"
+                  className="min-h-24 resize-y font-mono text-sm"
                 />
                 {parsedMetadata === '__INVALID__' && (
-                  <span className="text-xs text-red-500">JSON inválido.</span>
+                  <span className="text-xs text-destructive flex items-center gap-1.5">
+                    <Info className="h-3.5 w-3.5" />
+                    JSON inválido. Verifique a formatação.
+                  </span>
                 )}
               </div>
 
               {error && (
-                <div className="text-sm text-red-500">
+                <div className="bg-destructive/10 text-destructive rounded-md px-3 py-2 text-sm flex items-center gap-2">
+                  <Info className="h-4 w-4 shrink-0" />
                   {error}
                 </div>
               )}
 
-              <div className="flex items-center gap-3">
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" />Enviando...</>) : (<><Wand2 className="mr-2 h-4 w-4" />Analisar Lead</>)}
+              <div className="flex flex-wrap items-center gap-3 pt-2">
+                <Button type="submit" disabled={isSubmitting} className="gap-2">
+                  {isSubmitting ? (
+                    <>
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                      Enviando...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="h-4 w-4" />
+                      Analisar Lead
+                    </>
+                  )}
                 </Button>
-                <Button type="button" variant="outline" onClick={() => {
-                  setTitle('Exemplo - Vitascience')
-                  setLead('"Você está cansado de tentar de tudo para melhorar sua saúde e não ver resultados? ..."\n\nApresentamos um método baseado em ciência que transforma hábitos em resultados duradouros...')
-                  setMetadata('{"idioma":"pt-BR"}')
-                }}><PanelsTopLeft className="mr-2 h-4 w-4" />Preencher Exemplo</Button>
-                <Button type="button" variant="ghost" onClick={() => { setTitle(''); setLead(''); setMetadata(''); setResult(null); setError(null) }}><ListChecks className="mr-2 h-4 w-4" />Limpar</Button>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => {
+                    setTitle('Exemplo - Vitascience')
+                    setLead('\"Você está cansado de tentar de tudo para melhorar sua saúde e não ver resultados? ...\"\n\nApresentamos um método baseado em ciência que transforma hábitos em resultados duradouros...')
+                    setMetadata('{"idioma":"pt-BR"}')
+                  }}
+                  className="gap-2"
+                >
+                  <FileText className="h-4 w-4" />
+                  Preencher Exemplo
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  onClick={() => { 
+                    setTitle(''); 
+                    setLead(''); 
+                    setMetadata(''); 
+                    setResult(null); 
+                    setError(null);
+                    setImprovedLead('');
+                  }}
+                  className="gap-2"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  Limpar
+                </Button>
               </div>
             </form>
           </CardContent>
         </Card>
 
         {isWaiting && (
-          <Card className="shadow-sm bg-transparent">
-            <CardContent className="space-y-3">
+          <Card className="shadow-sm border-primary/20 bg-primary/5">
+            <CardContent className="pt-6">
               <div className="flex items-center justify-between">
-                <h2 className="font-medium flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Processando no n8n...</h2>
-                <span className="text-xs text-muted-foreground">Aguarde — atualizando automaticamente</span>
+                <div className="flex items-center gap-3">
+                  <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                  <div>
+                    <h3 className="font-medium">Processando no n8n...</h3>
+                    <p className="text-xs text-muted-foreground">Sua análise está sendo gerada</p>
+                  </div>
+                </div>
+                <Badge variant="outline" className="text-xs">Atualizando automaticamente</Badge>
               </div>
             </CardContent>
           </Card>
         )}
 
         {(improvedLead || result) && !isWaiting && (
-          <Card className="shadow-sm bg-transparent">
-            <CardContent className="space-y-4">
+          <Card className="shadow-sm">
+            <CardContent className="pt-6">
               <Tabs defaultValue="resumo" className="w-full">
-                <TabsList className="flex flex-wrap gap-2 overflow-x-auto">
-                  <TabsTrigger value="resumo">Resumo</TabsTrigger>
-                  {(analysis as any).consciousness && <TabsTrigger value="consciencia">Consciência</TabsTrigger>}
-                  {(analysis as any).structure && <TabsTrigger value="estrutura">Estrutural</TabsTrigger>}
+                <TabsList className="flex flex-wrap gap-1 mb-6 h-auto p-1">
+                  <TabsTrigger value="resumo" className="flex items-center gap-1.5 h-9">
+                    <Info className="h-4 w-4" />
+                    Resumo
+                  </TabsTrigger>
+                  {(analysis as any).consciousness && (
+                    <TabsTrigger value="consciencia" className="flex items-center gap-1.5 h-9">
+                      <Brain className="h-4 w-4" />
+                      Consciência
+                    </TabsTrigger>
+                  )}
+                  {(analysis as any).structure && (
+                    <TabsTrigger value="estrutura" className="flex items-center gap-1.5 h-9">
+                      <BarChart3 className="h-4 w-4" />
+                      Estrutural
+                    </TabsTrigger>
+                  )}
                   {Array.isArray((analysis as any).improvements) && (analysis as any).improvements.length > 0 && (
-                    <TabsTrigger value="melhorias">Melhorias</TabsTrigger>
+                    <TabsTrigger value="melhorias" className="flex items-center gap-1.5 h-9">
+                      <Lightbulb className="h-4 w-4" />
+                      Melhorias
+                    </TabsTrigger>
                   )}
                   {Array.isArray((analysis as any).angles) && (analysis as any).angles.length > 0 && (
-                    <TabsTrigger value="angulos">Ângulos</TabsTrigger>
+                    <TabsTrigger value="angulos" className="flex items-center gap-1.5 h-9">
+                      <ChevronRight className="h-4 w-4" />
+                      Ângulos
+                    </TabsTrigger>
                   )}
-                  {(analysis as any).qna && <TabsTrigger value="qna">Q&A</TabsTrigger>}
-                  {improvedLead && <TabsTrigger value="lead">Lead</TabsTrigger>}
-                  {result && <TabsTrigger value="json">JSON</TabsTrigger>}
+                  {(analysis as any).qna && (
+                    <TabsTrigger value="qna" className="flex items-center gap-1.5 h-9">
+                      <MessageSquareText className="h-4 w-4" />
+                      Q&A
+                    </TabsTrigger>
+                  )}
+                  {improvedLead && (
+                    <TabsTrigger value="lead" className="flex items-center gap-1.5 h-9">
+                      <FileText className="h-4 w-4" />
+                      Lead
+                    </TabsTrigger>
+                  )}
+                  {result && (
+                    <TabsTrigger value="json" className="flex items-center gap-1.5 h-9">
+                      <Code2 className="h-4 w-4" />
+                      JSON
+                    </TabsTrigger>
+                  )}
                 </TabsList>
 
-                <TabsContent value="resumo" className="space-y-3">
+                <TabsContent value="resumo" className="space-y-4">
                   <div className="flex flex-wrap items-center gap-2">
-                    <Badge variant="secondary">Status: {summary.status}</Badge>
-                    {correlationId && <Badge variant="outline">ID: {correlationId}</Badge>}
-                    {summary.levelDesc && <Badge>Consciência: {summary.levelDesc}</Badge>}
-                    {summary.framework && <Badge variant="outline">Framework: {summary.framework}</Badge>}
+                    <Badge variant="secondary" className="flex items-center gap-1">
+                      <Clock className="h-3.5 w-3.5" />
+                      Status: {summary.status}
+                    </Badge>
+                    {correlationId && (
+                      <Badge variant="outline" className="font-mono text-xs">
+                        ID: {correlationId}
+                      </Badge>
+                    )}
+                    {summary.levelDesc && (
+                      <Badge className="flex items-center gap-1">
+                        <Brain className="h-3.5 w-3.5" />
+                        Consciência: {summary.levelDesc}
+                      </Badge>
+                    )}
+                    {summary.framework && (
+                      <Badge variant="outline" className="flex items-center gap-1">
+                        <BarChart3 className="h-3.5 w-3.5" />
+                        Framework: {summary.framework}
+                      </Badge>
+                    )}
                   </div>
                   <Separator />
-                  <div className="grid gap-3 sm:grid-cols-3 text-sm">
-                    <div className="border rounded-md p-3">
-                      <div className="text-muted-foreground">Melhorias</div>
-                      <div className="font-medium">{summary.improvementsCount}</div>
-                    </div>
-                    <div className="border rounded-md p-3">
-                      <div className="text-muted-foreground">Ângulos</div>
-                      <div className="font-medium">{summary.anglesCount}</div>
-                    </div>
-                    <div className="border rounded-md p-3">
-                      <div className="text-muted-foreground">Q&A</div>
-                      <div className="font-medium">{summary.hasQna ? 'Disponível' : '—'}</div>
-                    </div>
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <Card className="bg-background/50">
+                      <CardContent className="pt-6">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-sm font-medium text-muted-foreground">Melhorias</h3>
+                          <Lightbulb className="h-5 w-5 text-amber-500" />
+                        </div>
+                        <p className="text-2xl font-bold">{summary.improvementsCount}</p>
+                      </CardContent>
+                    </Card>
+                    <Card className="bg-background/50">
+                      <CardContent className="pt-6">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-sm font-medium text-muted-foreground">Ângulos</h3>
+                          <ChevronRight className="h-5 w-5 text-blue-500" />
+                        </div>
+                        <p className="text-2xl font-bold">{summary.anglesCount}</p>
+                      </CardContent>
+                    </Card>
+                    <Card className="bg-background/50">
+                      <CardContent className="pt-6">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-sm font-medium text-muted-foreground">Q&A</h3>
+                          <MessageSquareText className="h-5 w-5 text-green-500" />
+                        </div>
+                        <p className="text-2xl font-bold">{summary.hasQna ? 'Disponível' : '—'}</p>
+                      </CardContent>
+                    </Card>
                   </div>
                 </TabsContent>
 
                 {(analysis as any).consciousness && (
-                  <TabsContent value="consciencia" className="space-y-2">
+                  <TabsContent value="consciencia" className="space-y-4">
                     {(() => {
                       const c: any = (analysis as any).consciousness
                       const nivel = c?.nivel_identificado?.nivel ?? c?.nivel_identificado ?? c?.nivel
@@ -489,13 +670,26 @@ export default function LeadPage() {
                       const adequacao = c?.adequacao
                       const justificativa = c?.justificativa || c?.analise || c?.texto || c?.text
                       return (
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            {(nivel || descricao) && <Badge variant="secondary">Nível: {descricao || nivel}</Badge>}
-                            {adequacao && <Badge>Adequação: {adequacao}</Badge>}
+                        <div className="space-y-4">
+                          <div className="flex flex-wrap items-center gap-2">
+                            {(nivel || descricao) && (
+                              <Badge variant="secondary" className="flex items-center gap-1">
+                                <Brain className="h-3.5 w-3.5" />
+                                Nível: {descricao || nivel}
+                              </Badge>
+                            )}
+                            {adequacao && (
+                              <Badge className="flex items-center gap-1">
+                                Adequação: {adequacao}
+                              </Badge>
+                            )}
                           </div>
                           {justificativa && (
-                            <div className="text-sm whitespace-pre-wrap">{justificativa}</div>
+                            <Card className="bg-background/50">
+                              <CardContent className="pt-6 text-sm whitespace-pre-wrap">
+                                {justificativa}
+                              </CardContent>
+                            </Card>
                           )}
                         </div>
                       )
@@ -504,26 +698,40 @@ export default function LeadPage() {
                 )}
 
                 {(analysis as any).structure && (
-                  <TabsContent value="estrutura" className="space-y-2">
+                  <TabsContent value="estrutura" className="space-y-4">
                     {(() => {
                       const s: any = (analysis as any).structure
                       const framework = s?.framework_usado || s?.framework
                       const detalhes = s?.analise_detalhada || s?.analise || s?.texto || s?.text
                       const elementos: string[] = s?.elementos_identificados
                       return (
-                        <div className="space-y-3">
+                        <div className="space-y-4">
                           <div className="flex items-center gap-2">
-                            {framework && <Badge variant="secondary">Framework: {framework}</Badge>}
+                            {framework && (
+                              <Badge variant="secondary" className="flex items-center gap-1">
+                                <BarChart3 className="h-3.5 w-3.5" />
+                                Framework: {framework}
+                              </Badge>
+                            )}
                           </div>
                           {Array.isArray(elementos) && elementos.length > 0 && (
-                            <ul className="list-disc pl-5 text-muted-foreground text-sm">
-                              {elementos.map((el, i) => (
-                                <li key={i}>{el}</li>
-                              ))}
-                            </ul>
+                            <Card className="bg-background/50">
+                              <CardContent className="pt-6">
+                                <h3 className="text-sm font-medium mb-3">Elementos Identificados</h3>
+                                <ul className="list-disc pl-5 text-muted-foreground text-sm space-y-1">
+                                  {elementos.map((el, i) => (
+                                    <li key={i}>{el}</li>
+                                  ))}
+                                </ul>
+                              </CardContent>
+                            </Card>
                           )}
                           {detalhes && (
-                            <div className="text-sm whitespace-pre-wrap">{detalhes}</div>
+                            <Card className="bg-background/50">
+                              <CardContent className="pt-6 text-sm whitespace-pre-wrap">
+                                {detalhes}
+                              </CardContent>
+                            </Card>
                           )}
                         </div>
                       )
@@ -535,18 +743,30 @@ export default function LeadPage() {
                   <TabsContent value="melhorias">
                     <Accordion type="single" collapsible className="w-full">
                       {((analysis as any).improvements as any[]).slice(0, 5).map((item: any, idx: number) => (
-                        <AccordionItem key={idx} value={`imp-${idx}`}>
-                          <AccordionTrigger>
+                        <AccordionItem key={idx} value={`imp-${idx}`} className="border-b border-border">
+                          <AccordionTrigger className="hover:no-underline py-4 px-4">
                             <div className="flex items-center gap-2">
                               <Badge variant="secondary">{idx + 1}</Badge>
-                              <span className="text-left">{item?.problema || `Ponto ${idx + 1}`}</span>
+                              <span className="text-left font-medium">{item?.problema || `Ponto ${idx + 1}`}</span>
                             </div>
                           </AccordionTrigger>
-                          <AccordionContent>
-                            <div className="grid gap-2 text-sm">
-                              {item?.explicacao && (<div><span className="font-medium">Explicação:</span> {item.explicacao}</div>)}
-                              {item?.solucao && (<div><span className="font-medium">Solução:</span> {item.solucao}</div>)}
-                              {item?.exemplo && (<div className="whitespace-pre-wrap"><span className="font-medium">Exemplo:</span> {item.exemplo}</div>)}
+                          <AccordionContent className="px-4 pb-4 pt-1">
+                            <div className="grid gap-3 text-sm">
+                              {item?.explicacao && (
+                                <div className="bg-muted/50 rounded-md p-3">
+                                  <span className="font-medium text-primary">Explicação:</span> {item.explicacao}
+                                </div>
+                              )}
+                              {item?.solucao && (
+                                <div className="bg-muted/50 rounded-md p-3">
+                                  <span className="font-medium text-primary">Solução:</span> {item.solucao}
+                                </div>
+                              )}
+                              {item?.exemplo && (
+                                <div className="bg-muted/50 rounded-md p-3 whitespace-pre-wrap">
+                                  <span className="font-medium text-primary">Exemplo:</span> {item.exemplo}
+                                </div>
+                              )}
                             </div>
                           </AccordionContent>
                         </AccordionItem>
@@ -556,57 +776,93 @@ export default function LeadPage() {
                 )}
 
                 {Array.isArray((analysis as any).angles) && (analysis as any).angles.length > 0 && (
-                  <TabsContent value="angulos" className="grid gap-3 sm:grid-cols-3">
+                  <TabsContent value="angulos" className="grid gap-4 sm:grid-cols-3">
                     {((analysis as any).angles as any[]).slice(0, 3).map((item: any, idx: number) => (
-                      <div key={idx} className="border rounded-md p-3 text-sm space-y-2">
-                        {item?.nivel_consciencia && (
-                          <div className="text-muted-foreground">Nível: {item.nivel_consciencia}</div>
-                        )}
-                        {item?.headline && (
-                          <div><span className="font-medium">Headline:</span> {item.headline}</div>
-                        )}
-                        {item?.lead && (
-                          <div className="whitespace-pre-wrap"><span className="font-medium">Lead:</span> {item.lead}</div>
-                        )}
-                        {item?.justificativa && (
-                          <div className="whitespace-pre-wrap"><span className="font-medium">Justificativa:</span> {item.justificativa}</div>
-                        )}
-                      </div>
+                      <Card key={idx} className="overflow-hidden">
+                        <CardHeader className="pb-2 pt-4 px-4">
+                          {item?.nivel_consciencia && (
+                            <Badge variant="outline" className="mb-1 w-fit">
+                              Nível: {item.nivel_consciencia}
+                            </Badge>
+                          )}
+                          {item?.headline && (
+                            <CardTitle className="text-sm">{item.headline}</CardTitle>
+                          )}
+                        </CardHeader>
+                        <CardContent className="px-4 pb-4 pt-0 text-sm space-y-2">
+                          {item?.lead && (
+                            <div className="whitespace-pre-wrap">
+                              <span className="font-medium text-primary">Lead:</span> {item.lead}
+                            </div>
+                          )}
+                          {item?.justificativa && (
+                            <div className="whitespace-pre-wrap text-muted-foreground">
+                              <span className="font-medium text-foreground">Justificativa:</span> {item.justificativa}
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
                     ))}
                   </TabsContent>
                 )}
 
                 {(analysis as any).qna && (
                   <TabsContent value="qna">
-                    <ScrollArea className="h-[400px] border rounded-md p-3 text-sm">
-                      {(analysis as any).qna}
-                    </ScrollArea>
+                    <Card className="bg-background/50">
+                      <CardContent className="pt-6">
+                        <ScrollArea className="h-[400px] pr-4">
+                          <div className="text-sm whitespace-pre-wrap">
+                            {(analysis as any).qna}
+                          </div>
+                        </ScrollArea>
+                      </CardContent>
+                    </Card>
                   </TabsContent>
                 )}
 
                 {improvedLead && (
-                  <TabsContent value="lead" className="space-y-2">
+                  <TabsContent value="lead" className="space-y-4">
                     <div className="flex items-center gap-2">
-                      <Button size="sm" variant="outline" onClick={handleCopyImproved}>Copiar</Button>
-                      <Button size="sm" onClick={handleDownloadImproved}>Baixar .txt</Button>
+                      <Button size="sm" variant="outline" onClick={handleCopyImproved} className="gap-2">
+                        <Copy className="h-4 w-4" />
+                        Copiar
+                      </Button>
+                      <Button size="sm" onClick={handleDownloadImproved} className="gap-2">
+                        <Download className="h-4 w-4" />
+                        Baixar .txt
+                      </Button>
                     </div>
-                    <Textarea
-                      value={improvedLead}
-                      onChange={(e) => setImprovedLead(e.target.value)}
-                      className="min-h-64"
-                    />
+                    <Card className="bg-background/50">
+                      <CardContent className="pt-6">
+                        <Textarea
+                          value={improvedLead}
+                          onChange={(e) => setImprovedLead(e.target.value)}
+                          className="min-h-64 resize-y"
+                        />
+                      </CardContent>
+                    </Card>
                   </TabsContent>
                 )}
 
                 {result && (
-                  <TabsContent value="json" className="space-y-2">
+                  <TabsContent value="json" className="space-y-4">
                     <div className="flex items-center gap-2">
-                      <Button size="sm" variant="outline" onClick={handleCopy}>Copiar JSON</Button>
-                      <Button size="sm" onClick={handleDownload}>Baixar JSON</Button>
+                      <Button size="sm" variant="outline" onClick={handleCopy} className="gap-2">
+                        <Copy className="h-4 w-4" />
+                        Copiar JSON
+                      </Button>
+                      <Button size="sm" onClick={handleDownload} className="gap-2">
+                        <Download className="h-4 w-4" />
+                        Baixar JSON
+                      </Button>
                     </div>
-                    <pre className="text-xs overflow-auto max-h-[500px] p-3 border rounded-md">
-{JSON.stringify(result, null, 2)}
-                    </pre>
+                    <Card className="bg-background/50">
+                      <CardContent className="pt-6">
+                        <pre className="text-xs overflow-auto max-h-[500px] p-3 border rounded-md bg-muted/30 font-mono">
+                          {JSON.stringify(result, null, 2)}
+                        </pre>
+                      </CardContent>
+                    </Card>
                   </TabsContent>
                 )}
               </Tabs>
@@ -617,5 +873,4 @@ export default function LeadPage() {
     </div>
   )
 }
-
 
