@@ -38,6 +38,8 @@ export default function ChatPage() {
   const [isLoadingMessages, setIsLoadingMessages] = useState(false)
   const [input, setInput] = useState('')
   const [isSending, setIsSending] = useState(false)
+  const [improvedLead, setImprovedLead] = useState('')
+  const [waitingCorrelationId, setWaitingCorrelationId] = useState<string | null>(null)
 
   const scrollRef = useRef<HTMLDivElement | null>(null)
 
@@ -95,6 +97,28 @@ export default function ChatPage() {
     loadMessages(selectedCopyId).catch(() => {})
   }, [selectedCopyId])
 
+  // Load improved lead for the selected copy
+  useEffect(() => {
+    if (!selectedCopyId) {
+      setImprovedLead('')
+      return
+    }
+    ;(async () => {
+      try {
+        const res = await fetch(`/api/lead/get?id=${encodeURIComponent(selectedCopyId)}`, { cache: 'no-store' })
+        const data = await res.json()
+        if (!res.ok) throw new Error(data?.error || 'Falha ao carregar lead melhorada')
+        if (typeof data?.improvedLead === 'string') {
+          setImprovedLead(data.improvedLead)
+        } else {
+          setImprovedLead('')
+        }
+      } catch {
+        setImprovedLead('')
+      }
+    })()
+  }, [selectedCopyId])
+
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!selectedCopyId) return
@@ -110,32 +134,33 @@ export default function ChatPage() {
       if (!res.ok) throw new Error(data?.error || 'Falha ao enviar')
 
       setInput('')
+      // Refresh messages (user message saved server-side)
+      await loadMessages(selectedCopyId)
 
-      // Optimistic update: add user message immediately
-      setMessages((prev) => ([
-        ...prev,
-        {
-          id: `temp-${Date.now()}`,
-          copy_id: selectedCopyId,
-          role: 'user',
-          content: input.trim(),
-          message_correlation_id: data?.messageCorrelationId || null,
-          status: 'ready',
-          created_at: new Date().toISOString(),
-        } as ChatMessage
-      ]))
+      // Wait for assistant reply by correlation id
+      const correlationId: string | null = data?.messageCorrelationId || null
+      setWaitingCorrelationId(correlationId)
 
-      // Start short polling to fetch assistant reply
       let attempts = 0
-      const maxAttempts = 30
-      const interval = setInterval(async () => {
+      const maxAttempts = 60
+      const pollDelayMs = 2000
+      while (attempts < maxAttempts) {
         attempts += 1
-        await loadMessages(selectedCopyId)
-        if (attempts >= maxAttempts) clearInterval(interval)
-      }, 2000)
+        try {
+          const resH = await fetch(`/api/chat/history?copyId=${encodeURIComponent(selectedCopyId)}`, { cache: 'no-store' })
+          const dataH = await resH.json()
+          const items: ChatMessage[] = Array.isArray(dataH.items) ? dataH.items : []
+          // If assistant replied (match by correlation id or just new assistant msg)
+          const hasReply = items.some((m) => m.role === 'assistant' && (!correlationId || m.message_correlation_id === correlationId))
+          setMessages(items)
+          if (hasReply) break
+        } catch {}
+        await new Promise((r) => setTimeout(r, pollDelayMs))
+      }
     } catch (err: any) {
       console.error(err)
     } finally {
+      setWaitingCorrelationId(null)
       setIsSending(false)
     }
   }
@@ -212,7 +237,7 @@ export default function ChatPage() {
                         </CardHeader>
                         <CardContent>
                           <div className="min-h-[96px] max-h-64 overflow-auto whitespace-pre-wrap text-sm">
-                            {latestUser?.content || '—'}
+                            {improvedLead || latestUser?.content || '—'}
                           </div>
                         </CardContent>
                       </Card>
