@@ -14,7 +14,7 @@ async function getCopyTeam(copyId: string) {
   return data?.team_id as string | undefined
 }
 
-export async function GET(_request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(_request: NextRequest, { params }: any) {
   try {
     const user = await getSessionUser()
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
@@ -36,7 +36,7 @@ export async function GET(_request: NextRequest, { params }: { params: { id: str
   }
 }
 
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, { params }: any) {
   try {
     const user = await getSessionUser(request)
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
