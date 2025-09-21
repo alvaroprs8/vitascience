@@ -279,7 +279,7 @@ export default function ChatPage() {
                 {!selectedCopyId ? (
                   <div className="text-sm text-slate-500">Selecione uma copy na coluna esquerda para conversar.</div>
                 ) : (
-                  <div className="grid gap-4 sm:grid-cols-3 h-[70vh] min-w-0">
+                  <div className="grid gap-4 sm:grid-cols-2 h-[70vh] min-w-0">
                     <div className="sm:col-span-1 flex flex-col min-w-0 max-h-[70vh]">
                       {showCurrentText && (
                         <Card className="bg-white border-slate-200 h-full overflow-hidden">
@@ -303,7 +303,7 @@ export default function ChatPage() {
                         </Card>
                       )}
                     </div>
-                    <div className="sm:col-span-2 flex flex-col min-w-0 max-h-[70vh]">
+                    <div className="sm:col-span-1 flex flex-col min-w-0 max-h-[70vh]">
                       <div ref={scrollRef} className="flex-1 overflow-y-auto overflow-x-hidden pr-4 min-w-0 max-h-[60vh]">
                         <div className="space-y-3">
                           {isLoadingMessages && (
