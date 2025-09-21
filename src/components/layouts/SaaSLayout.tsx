@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Dock } from "@/components/ui/dock-two";
-import { Home, Workflow } from "lucide-react";
+import { Home, Workflow, MessageSquare } from "lucide-react";
 
 type SaaSLayoutProps = {
   children: React.ReactNode
@@ -11,6 +11,7 @@ type SaaSLayoutProps = {
 export function SaaSLayout({ children }: SaaSLayoutProps) {
   const menuItems = [
     { icon: Home, label: "Visão geral", onClick: () => { window.location.href = "/" } },
+    { icon: MessageSquare, label: "Chat", onClick: () => { window.location.href = "/chat" } },
     { icon: Workflow, label: "Clone do Eugene", onClick: () => { window.location.href = "/lead" } },
   ] as const;
 

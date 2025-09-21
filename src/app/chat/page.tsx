@@ -3,12 +3,13 @@
 import * as React from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { PromptInput, PromptInputTextarea, PromptInputActions } from '@/components/ui/prompt-input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { Send, MessageSquare, FileText, Loader2 } from 'lucide-react'
+import { useAnimatedText } from '@/components/ui/animated-text'
 
 type CopyItem = {
   id: string
@@ -39,6 +40,18 @@ export default function ChatPage() {
   const [isSending, setIsSending] = useState(false)
 
   const scrollRef = useRef<HTMLDivElement | null>(null)
+
+  const latestUser = useMemo(() => {
+    const list = messages.filter((m) => m.role === 'user')
+    return list.length ? list[list.length - 1] : null
+  }, [messages])
+
+  const latestAssistant = useMemo(() => {
+    const list = messages.filter((m) => m.role === 'assistant')
+    return list.length ? list[list.length - 1] : null
+  }, [messages])
+
+  const animatedAssistant = useAnimatedText(latestAssistant?.content || '', ' ')
 
   const loadCopies = async () => {
     setLoadingCopies(true)
@@ -182,6 +195,29 @@ export default function ChatPage() {
                   <div className="text-sm text-slate-500">Selecione uma copy na coluna esquerda para conversar.</div>
                 ) : (
                   <div className="flex flex-col h-[70vh]">
+                    {/* Painel de comparação: texto atual (usuário) x resposta IA */}
+                    <div className="grid gap-4 sm:grid-cols-2 mb-4">
+                      <Card className="bg-white border-slate-200">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm">Texto atual</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="min-h-[96px] max-h-64 overflow-auto whitespace-pre-wrap text-sm">
+                            {latestUser?.content || '—'}
+                          </div>
+                        </CardContent>
+                      </Card>
+                      <Card className="bg-white border-slate-200">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm">Resposta da IA</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="min-h-[96px] max-h-64 overflow-auto whitespace-pre-wrap text-sm">
+                            {animatedAssistant || '—'}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
                     <div ref={scrollRef} className="flex-1 overflow-auto pr-4">
                       <div className="space-y-3">
                         {isLoadingMessages && (
@@ -199,20 +235,39 @@ export default function ChatPage() {
                       </div>
                     </div>
                     <Separator className="my-3" />
-                    <form onSubmit={handleSend} className="flex items-center gap-2">
-                      <Input
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        placeholder="Digite sua mensagem..."
-                      />
-                      <Button type="submit" disabled={!selectedCopyId || isSending} className="gap-2">
-                        {isSending ? (
-                          <><Loader2 className="h-4 w-4 animate-spin" /> Enviando...</>
-                        ) : (
-                          <><Send className="h-4 w-4" /> Enviar</>
-                        )}
-                      </Button>
-                    </form>
+                    <PromptInput
+                      isLoading={isSending}
+                      value={input}
+                      onValueChange={setInput}
+                      onSubmit={(e?: any) => {
+                        if (!selectedCopyId || isSending || !input.trim()) return
+                        handleSend(e as any || { preventDefault: () => {} } as any)
+                      }}
+                      className=""
+                    >
+                      <div className="flex items-end gap-2">
+                        <div className="flex-1">
+                          <PromptInputTextarea
+                            placeholder="Digite sua mensagem... (Enter para enviar, Shift+Enter para nova linha)"
+                            maxLength={4000}
+                          />
+                        </div>
+                        <PromptInputActions>
+                          <Button
+                            type="button"
+                            disabled={!selectedCopyId || isSending || !input.trim()}
+                            className="gap-2"
+                            onClick={(e) => handleSend(e as any)}
+                          >
+                            {isSending ? (
+                              <><Loader2 className="h-4 w-4 animate-spin" /> Enviando...</>
+                            ) : (
+                              <><Send className="h-4 w-4" /> Enviar</>
+                            )}
+                          </Button>
+                        </PromptInputActions>
+                      </div>
+                    </PromptInput>
                   </div>
                 )}
               </CardContent>
