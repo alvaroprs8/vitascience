@@ -48,6 +48,9 @@ export default function ChatPage() {
   }, [messages])
 
   const [showCurrentText, setShowCurrentText] = useState(false)
+  const [editedLead, setEditedLead] = useState('')
+  const [isSavingLead, setIsSavingLead] = useState(false)
+  const [saveLeadMessage, setSaveLeadMessage] = useState<string | null>(null)
 
   const loadCopies = async () => {
     setLoadingCopies(true)
@@ -95,6 +98,7 @@ export default function ChatPage() {
   useEffect(() => {
     if (!selectedCopyId) {
       setImprovedLead('')
+      setEditedLead('')
       return
     }
     ;(async () => {
@@ -104,14 +108,44 @@ export default function ChatPage() {
         if (!res.ok) throw new Error(data?.error || 'Falha ao carregar lead melhorada')
         if (typeof data?.improvedLead === 'string') {
           setImprovedLead(data.improvedLead)
+          setEditedLead(data.improvedLead)
         } else {
           setImprovedLead('')
+          setEditedLead('')
         }
       } catch {
         setImprovedLead('')
+        setEditedLead('')
       }
     })()
   }, [selectedCopyId])
+
+  const handleShowCurrentForCopy = (copyId: string) => {
+    setSelectedCopyId(copyId)
+    setShowCurrentText(true)
+  }
+
+  const handleSaveLead = async () => {
+    if (!selectedCopyId) return
+    setIsSavingLead(true)
+    setSaveLeadMessage(null)
+    try {
+      const res = await fetch('/api/lead/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: selectedCopyId, improvedLead: editedLead })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data?.error || 'Falha ao salvar')
+      setImprovedLead(editedLead)
+      setSaveLeadMessage('Salvo com sucesso')
+      setTimeout(() => setSaveLeadMessage(null), 2000)
+    } catch (err: any) {
+      setSaveLeadMessage(err?.message || 'Erro ao salvar')
+    } finally {
+      setIsSavingLead(false)
+    }
+  }
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -208,13 +242,22 @@ export default function ChatPage() {
                             )}
                           </div>
                         </div>
-                        <Button 
-                          size="sm" 
-                          onClick={() => setSelectedCopyId(c.id)}
-                          className="shrink-0"
-                        >
-                          Selecionar
-                        </Button>
+                        <div className="shrink-0 flex flex-col gap-2">
+                          <Button 
+                            size="sm" 
+                            onClick={() => setSelectedCopyId(c.id)}
+                            className=""
+                          >
+                            Selecionar
+                          </Button>
+                          <Button 
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleShowCurrentForCopy(c.id)}
+                          >
+                            Mostrar texto atual
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -236,43 +279,49 @@ export default function ChatPage() {
                 {!selectedCopyId ? (
                   <div className="text-sm text-slate-500">Selecione uma copy na coluna esquerda para conversar.</div>
                 ) : (
-                  <div className="flex flex-col h-[70vh]">
-                    {/* Texto atual (colapsável) */}
-                    <div className="mb-4">
-                      <div className="flex items-center justify-between">
-                        <div className="text-sm font-medium text-slate-700">Texto atual</div>
-                        <Button variant="outline" size="sm" onClick={() => setShowCurrentText((v) => !v)}>
-                          {showCurrentText ? 'Esconder' : 'Mostrar'}
-                        </Button>
-                      </div>
+                  <div className="grid gap-4 sm:grid-cols-3 h-[70vh]">
+                    <div className="sm:col-span-1 flex flex-col">
                       {showCurrentText && (
-                        <Card className="mt-2 bg-white border-slate-200">
-                          <CardContent className="pt-4">
-                            <div className="max-h-40 overflow-auto whitespace-pre-wrap text-sm text-slate-700">
-                              {improvedLead || latestUser?.content || '—'}
+                        <Card className="bg-white border-slate-200 h-full">
+                          <CardHeader className="pb-2">
+                            <CardTitle className="text-sm">Texto atual</CardTitle>
+                          </CardHeader>
+                          <CardContent className="flex-1 flex flex-col gap-2 min-h-0">
+                            <textarea
+                              className="w-full flex-1 min-h-[200px] max-h-full resize-none rounded-md border border-slate-200 p-2 text-sm"
+                              value={editedLead}
+                              onChange={(e) => setEditedLead(e.target.value)}
+                              placeholder="Edite a lead aqui..."
+                            />
+                            <div className="flex items-center justify-between gap-2 pt-1">
+                              <div className="text-xs text-slate-500 h-5">{saveLeadMessage || ''}</div>
+                              <Button size="sm" onClick={handleSaveLead} disabled={isSavingLead || !selectedCopyId}>
+                                {isSavingLead ? <><Loader2 className="h-4 w-4 animate-spin" /> Salvando...</> : 'Salvar'}
+                              </Button>
                             </div>
                           </CardContent>
                         </Card>
                       )}
                     </div>
-                    <div ref={scrollRef} className="flex-1 overflow-auto pr-4">
-                      <div className="space-y-3">
-                        {isLoadingMessages && (
-                          <div className="text-sm text-slate-500 flex items-center gap-2">
-                            <Loader2 className="h-4 w-4 animate-spin" /> Carregando mensagens...
-                          </div>
-                        )}
-                        {messages.map((m) => (
-                          <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                            <div className={`max-w-[80%] rounded-lg px-3 py-2 text-sm whitespace-pre-wrap ${m.role === 'user' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-900'}`}>
-                              {m.content}
+                    <div className="sm:col-span-2 flex flex-col">
+                      <div ref={scrollRef} className="flex-1 overflow-auto pr-4">
+                        <div className="space-y-3">
+                          {isLoadingMessages && (
+                            <div className="text-sm text-slate-500 flex items-center gap-2">
+                              <Loader2 className="h-4 w-4 animate-spin" /> Carregando mensagens...
                             </div>
-                          </div>
-                        ))}
+                          )}
+                          {messages.map((m) => (
+                            <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                              <div className={`max-w-[80%] rounded-lg px-3 py-2 text-sm whitespace-pre-wrap ${m.role === 'user' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-900'}`}>
+                                {m.content}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                    <Separator className="my-3" />
-                    <PromptInput
+                      <Separator className="my-3" />
+                      <PromptInput
                       isLoading={isSending}
                       value={input}
                       onValueChange={setInput}
@@ -304,7 +353,8 @@ export default function ChatPage() {
                           </Button>
                         </PromptInputActions>
                       </div>
-                    </PromptInput>
+                      </PromptInput>
+                    </div>
                   </div>
                 )}
               </CardContent>
