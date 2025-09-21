@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
-import { Send, MessageSquare, FileText, Loader2 } from 'lucide-react'
+import { Send, MessageSquare, FileText, Loader2, Clock } from 'lucide-react'
 import { useAnimatedText } from '@/components/ui/animated-text'
 
 type CopyItem = {
@@ -143,47 +143,56 @@ export default function ChatPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-slate-50 py-6">
       <div className="container mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-          {/* Sidebar */}
-          <div className="md:col-span-4 lg:col-span-3">
-            <Card className="bg-white border-slate-200">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <FileText className="h-4 w-4" /> Copies
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {loadingCopies && (
-                    <div className="text-sm text-slate-500 flex items-center gap-2">
-                      <Loader2 className="h-4 w-4 animate-spin" /> Carregando...
-                    </div>
-                  )}
-                  {!loadingCopies && copies.length === 0 && (
-                    <div className="text-sm text-slate-500">Nenhuma copy encontrada.</div>
-                  )}
-                  <div className="max-h-[60vh] overflow-auto pr-1 space-y-2">
-                    {copies.map((c) => (
-                      <button
-                        key={c.id}
-                        onClick={() => setSelectedCopyId(c.id)}
-                        className={`w-full text-left border rounded-md p-2 hover:bg-slate-50 ${selectedCopyId === c.id ? 'border-slate-400 bg-slate-50' : 'border-slate-200'}`}
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="truncate text-sm font-medium">{c.title || 'Sem título'}</div>
-                          {c.hasImproved && <Badge variant="outline">Lead</Badge>}
+        {/* Carrossel de copies no topo */}
+        <div className="overflow-x-auto py-2">
+          <div className="flex gap-4 snap-x snap-mandatory pb-2">
+            {loadingCopies ? (
+              <div className="text-sm text-slate-500 px-2 flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" /> Carregando...
+              </div>
+            ) : copies.length === 0 ? (
+              <div className="text-sm text-slate-500 px-2">Nenhuma copy encontrada.</div>
+            ) : (
+              copies.slice(0, 20).map((c) => (
+                <div key={c.id} className="snap-start shrink-0 w-[85%] sm:w-[420px]">
+                  <Card className={`overflow-hidden bg-white border-slate-200 h-full ${selectedCopyId === c.id ? 'ring-2 ring-emerald-500' : ''}`}>
+                    <CardContent className="p-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <div className="font-medium truncate text-sm">{c.title || 'Sem título'}</div>
+                            {c.hasImproved && <Badge variant="outline" className="shrink-0">Lead</Badge>}
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                            <Badge variant="secondary" className="text-xs font-normal">
+                              {c.status}
+                            </Badge>
+                            {c.receivedAt && (
+                              <div className="flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                {new Date(c.receivedAt).toLocaleString()}
+                              </div>
+                            )}
+                          </div>
                         </div>
-                        <div className="text-xs text-muted-foreground mt-1">{c.status}</div>
-                      </button>
-                    ))}
-                  </div>
+                        <Button 
+                          size="sm" 
+                          onClick={() => setSelectedCopyId(c.id)}
+                          className="shrink-0"
+                        >
+                          Selecionar
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
-              </CardContent>
-            </Card>
+              ))
+            )}
           </div>
+        </div>
 
-          {/* Chat panel */}
-          <div className="md:col-span-8 lg:col-span-9">
+        {/* Painel do chat */}
+        <div className="mt-4">
             <Card className="bg-white border-slate-200">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
@@ -272,7 +281,6 @@ export default function ChatPage() {
                 )}
               </CardContent>
             </Card>
-          </div>
         </div>
       </div>
     </div>
