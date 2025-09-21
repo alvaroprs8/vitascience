@@ -31,6 +31,7 @@ import {
   Send, 
   Upload 
 } from 'lucide-react'
+import AvatarGroup from '@/components/avatar-group'
 
 export default function LeadPage() {
   const supabase = React.useMemo(() => createSupabaseBrowserClient(), [])
@@ -342,40 +343,24 @@ export default function LeadPage() {
               <h2 className="text-base font-semibold text-slate-900">Escolha o clone para analisar sua lead</h2>
               <p className="text-sm text-slate-600">Atualmente disponível: Eugene Schwartz. Outros clones estarão disponíveis em breve.</p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {[ 
-                { id: 'eugene', name: 'Eugene Schwartz', desc: 'Níveis de consciência', available: true },
-                { id: 'hormozi', name: 'Alex Hormozi', desc: 'Ofertas e valor', available: false },
-                { id: 'halbert', name: 'Gary Halbert', desc: 'Direto e persuasivo', available: false },
-                { id: 'kennedy', name: 'Dan Kennedy', desc: 'Resposta direta', available: false },
-                { id: 'ogilvy', name: 'David Ogilvy', desc: 'Branding e pesquisa', available: false },
-              ].map((c: any) => {
-                const isSelected = selectedClone === c.id
-                return (
-                  <button
-                    key={c.id}
-                    type="button"
-                    onClick={() => c.available && setSelectedClone(c.id)}
-                    disabled={!c.available}
-                    className={`text-left rounded-lg border p-4 transition shadow-sm bg-white
-                      ${isSelected ? 'border-emerald-500 ring-2 ring-emerald-200' : 'border-slate-200 hover:border-slate-300'}
-                      ${!c.available ? 'opacity-60 cursor-not-allowed' : ''}
-                    `}
-                    aria-pressed={isSelected}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="font-medium text-slate-900">{c.name}</div>
-                      {!c.available && (
-                        <Badge variant="secondary" className="text-[11px]">Em breve</Badge>
-                      )}
-                    </div>
-                    <div className="text-xs text-slate-500 mt-1">{c.desc}</div>
-                    {isSelected && c.available && (
-                      <div className="mt-2 text-xs text-emerald-700">Selecionado</div>
-                    )}
-                  </button>
-                )
-              })}
+            <div className="flex flex-col gap-3">
+              <AvatarGroup
+                items={[
+                  { id: 1, name: 'Eugene Schwartz', designation: 'Níveis de consciência', image: 'https://i.pravatar.cc/96?img=21', available: true },
+                  { id: 2, name: 'Alex Hormozi', designation: 'Ofertas e valor', image: 'https://i.pravatar.cc/96?img=22', available: false },
+                  { id: 3, name: 'Gary Halbert', designation: 'Direto e persuasivo', image: 'https://i.pravatar.cc/96?img=23', available: false },
+                  { id: 4, name: 'Dan Kennedy', designation: 'Resposta direta', image: 'https://i.pravatar.cc/96?img=24', available: false },
+                  { id: 5, name: 'David Ogilvy', designation: 'Branding e pesquisa', image: 'https://i.pravatar.cc/96?img=25', available: false },
+                ]}
+                maxVisible={5}
+                size="lg"
+                selectedId={{ eugene: 1, hormozi: 2, halbert: 3, kennedy: 4, ogilvy: 5 }[selectedClone]}
+                onItemClick={(item) => {
+                  const map: Record<number, typeof selectedClone> = { 1: 'eugene', 2: 'hormozi', 3: 'halbert', 4: 'kennedy', 5: 'ogilvy' }
+                  if ((item as any).available) setSelectedClone(map[item.id])
+                }}
+              />
+              <div className="text-xs text-slate-500">Passe o mouse para ver detalhes. Clones "Em breve" estão desabilitados.</div>
             </div>
           </CardContent>
         </Card>
