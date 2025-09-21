@@ -48,6 +48,10 @@ export type Message = {
   text: string;
   date: string;
   starred?: boolean;
+  /** Optional fields for copy insights */
+  cloneName?: string;
+  copywriter?: string;
+  description?: string;
 };
 
 export type SortBy = "manual" | "date" | "name" | "progress";
@@ -93,6 +97,8 @@ export type ProjectDashboardProps = {
   onProjectCreate?: (project: Project) => void;
   generateId?: () => string;
   onMessageStarChange?: (messageId: string, starred: boolean) => void;
+  /** Click handler for message/copy cards */
+  onMessageClick?: (message: Message) => void;
   showThemeToggle?: boolean;
   onToggleTheme?: () => void;
   theme?: ThemeMode;
@@ -101,6 +107,10 @@ export type ProjectDashboardProps = {
   persistKey?: string;
   /** Optional custom content (e.g., KPIs/Charts) rendered at top of main area */
   extraContent?: React.ReactNode;
+  /** Show left sidebar (icon menu). Defaults to true */
+  showSidebar?: boolean;
+  /** Custom title for messages panel */
+  messagesTitle?: string;
   className?: string;
   loading?: boolean;
   emptyProjectsLabel?: string;
@@ -342,6 +352,8 @@ export function ProjectDashboard({
   persistKey,
   // Misc
   extraContent,
+  showSidebar = true,
+  messagesTitle = "Client Messages",
   className = "",
   loading = false,
   emptyProjectsLabel = "No projects match your search.",
@@ -901,30 +913,32 @@ export function ProjectDashboard({
 
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
-        <aside className={cx(
-          "hidden sm:flex flex-col items-center border-r border-slate-200 dark:border-slate-700",
-          spacing.page.sidebar,
-          spacing.gap.sm
-        )}>
-          {sidebarLinks.map((l) => (
-            <a
-              key={l.id}
-              href={l.href || "#"}
-              className={cx(
-                "size-11 inline-flex items-center justify-center rounded-lg transition-all",
-                "ring-1 ring-slate-200 dark:ring-slate-700",
-                l.active
-                  ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900"
-                  : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-              )}
-              aria-current={l.active ? "page" : undefined}
-              title={l.label}
-            >
-              {l.icon ?? getNavIcon(l.id)}
-              <span className="sr-only">{l.label}</span>
-            </a>
-          ))}
-        </aside>
+        {showSidebar && (
+          <aside className={cx(
+            "hidden sm:flex flex-col items-center border-r border-slate-200 dark:border-slate-700",
+            spacing.page.sidebar,
+            spacing.gap.sm
+          )}>
+            {sidebarLinks.map((l) => (
+              <a
+                key={l.id}
+                href={l.href || "#"}
+                className={cx(
+                  "size-11 inline-flex items-center justify-center rounded-lg transition-all",
+                  "ring-1 ring-slate-200 dark:ring-slate-700",
+                  l.active
+                    ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900"
+                    : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                )}
+                aria-current={l.active ? "page" : undefined}
+                title={l.label}
+              >
+                {l.icon ?? getNavIcon(l.id)}
+                <span className="sr-only">{l.label}</span>
+              </a>
+            ))}
+          </aside>
+        )}
 
         {/* Main content */}
         <main className={cx(
@@ -1397,7 +1411,7 @@ export function ProjectDashboard({
             spacing.page.messages
           )}>
             <p className="text-base font-semibold text-slate-900 dark:text-slate-100">
-              Client Messages
+              {messagesTitle}
             </p>
             <button
               className="md:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
@@ -1414,12 +1428,13 @@ export function ProjectDashboard({
             "space-y-3"
           )}>
             {messages.map((m) => (
-              <div
+              <button
                 key={m.id}
+                onClick={() => onMessageClick?.(m)}
                 className={cx(
-                  "flex items-start rounded-lg",
+                  "w-full text-left flex items-start rounded-lg",
                   "ring-1 ring-slate-200 dark:ring-slate-700",
-                  "bg-white dark:bg-slate-800",
+                  "bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700",
                   spacing.card.compact,
                   spacing.gap.sm
                 )}
@@ -1438,7 +1453,7 @@ export function ProjectDashboard({
                       <input
                         type="checkbox"
                         checked={isStarred(m)}
-                        onChange={() => toggleStar(m)}
+                        onChange={(e) => { e.stopPropagation(); toggleStar(m); }}
                         className="sr-only"
                         aria-label={`Star message from ${m.name}`}
                       />
@@ -1452,14 +1467,27 @@ export function ProjectDashboard({
                       />
                     </label>
                   </div>
-                  <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">
-                    {m.text}
-                  </p>
+                  {/* Copy-specific details if provided */}
+                  {(m.cloneName || m.copywriter) && (
+                    <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                      {m.cloneName && (<span className="mr-2">Clone: <strong className="text-slate-700 dark:text-slate-200">{m.cloneName}</strong></span>)}
+                      {m.copywriter && (<span>Copywriter: <strong className="text-slate-700 dark:text-slate-200">{m.copywriter}</strong></span>)}
+                    </div>
+                  )}
+                  {m.description ? (
+                    <p className="text-sm text-slate-600 dark:text-slate-300 mt-1 line-clamp-2">
+                      {m.description}
+                    </p>
+                  ) : (
+                    <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">
+                      {m.text}
+                    </p>
+                  )}
                   <p className="text-xs text-slate-400 dark:text-slate-500 mt-2">
                     {m.date}
                   </p>
                 </div>
-              </div>
+              </button>
             ))}
             {messages.length === 0 && (
               <div className="text-center py-8 text-sm text-slate-500 dark:text-slate-400">
