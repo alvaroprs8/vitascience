@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server'
 import { randomUUID } from 'crypto'
+import { supabaseAdmin } from '@/services/supabase'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
@@ -16,6 +17,12 @@ export async function POST(request: NextRequest) {
       payload = await request.json()
     } catch {
       return Response.json({ error: 'Invalid JSON body' }, { status: 400 })
+    }
+
+    // Validate and capture the original lead content
+    const originalLead: string | undefined = payload?.vsl_copy || payload?.lead
+    if (!originalLead || !String(originalLead).trim()) {
+      return Response.json({ error: 'Lead is required' }, { status: 400 })
     }
 
     const headers: Record<string, string> = {
@@ -39,6 +46,26 @@ export async function POST(request: NextRequest) {
     }
 
     const asyncPayload = { ...baseInput, correlationId, callbackUrl }
+
+    // Persist a pending record with the original lead before calling n8n
+    {
+      const pendingData: any = {}
+      if (payload?.title !== undefined) pendingData.title = payload.title
+      if (payload?.metadata !== undefined) pendingData.metadata = payload.metadata
+
+      const { error: upsertError } = await supabaseAdmin
+        .from('lead_results')
+        .upsert({
+          correlation_id: correlationId,
+          status: 'pending',
+          original_lead: String(originalLead),
+          data: Object.keys(pendingData).length ? pendingData : null,
+        }, { onConflict: 'correlation_id' })
+
+      if (upsertError) {
+        return Response.json({ error: `Failed to persist pending lead: ${upsertError.message}` }, { status: 500 })
+      }
+    }
 
     const n8nResponse = await fetch(n8nUrl, {
       method: 'POST',

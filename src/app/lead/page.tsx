@@ -104,49 +104,6 @@ export default function LeadPage() {
     return undefined
   }
 
-  function extractOriginalLeadFromJson(data: any): string | undefined {
-    if (!data) return undefined
-
-    // Highest priority: explicit original lead fields
-    const explicitKeys = [
-      'originalLead', 'leadOriginal', 'original_lead', 'lead_input', 'inputLead', 'vsl_copy',
-    ]
-    for (const key of explicitKeys) {
-      const value = (data as any)?.[key]
-      if (typeof value === 'string' && value.trim()) return value
-    }
-
-    // Common wrappers where original input may be stored
-    const wrappers = ['input', 'request', 'payload', 'params', 'body', 'data']
-    for (const w of wrappers) {
-      const nested = (data as any)?.[w]
-      if (typeof nested === 'string' && nested.trim()) return nested
-      if (nested && typeof nested === 'object') {
-        const directLead = (nested as any)?.lead
-        if (typeof directLead === 'string' && directLead.trim()) return directLead
-        const directVslCopy = (nested as any)?.vsl_copy
-        if (typeof directVslCopy === 'string' && directVslCopy.trim()) return directVslCopy
-        const found = extractOriginalLeadFromJson(nested)
-        if (found) return found
-      }
-    }
-
-    // Arrays
-    if (Array.isArray(data)) {
-      for (const item of data) {
-        const found = extractOriginalLeadFromJson(item)
-        if (found) return found
-      }
-    }
-
-    // As a last resort, consider a top-level 'lead' as original
-    if (typeof (data as any)?.lead === 'string' && (data as any).lead.trim()) {
-      return (data as any).lead
-    }
-
-    return undefined
-  }
-
   const resultRoot = useMemo(() => {
     if (!result) return null
     const r = result as any
@@ -222,10 +179,6 @@ export default function LeadPage() {
         setResult(data)
         const improved = extractImprovedLeadFromJson(data)
         setImprovedLead(typeof improved === 'string' ? improved : '')
-        const original = extractOriginalLeadFromJson(data)
-        if (typeof original === 'string' && original.trim()) {
-          setLead(original)
-        }
       } else {
         const text = await res.text()
         setResult({ raw: text })
@@ -256,10 +209,6 @@ export default function LeadPage() {
           setImprovedLead(typeof data.improvedLead === 'string' && data.improvedLead.trim()
             ? data.improvedLead
             : extractImprovedLeadFromJson(data) || '')
-          const original = extractOriginalLeadFromJson(data)
-          if (typeof original === 'string' && original.trim()) {
-            setLead(original)
-          }
           clearInterval(timer)
         }
       } catch {
@@ -335,15 +284,6 @@ export default function LeadPage() {
       setResult(data)
       const improved = extractImprovedLeadFromJson(data)
       setImprovedLead(typeof improved === 'string' ? improved : '')
-      const originalFromApi = (data as any)?.originalLead
-      if (typeof originalFromApi === 'string' && originalFromApi.trim()) {
-        setLead(originalFromApi)
-      } else {
-        const original = extractOriginalLeadFromJson(data)
-        if (typeof original === 'string' && original.trim()) {
-          setLead(original)
-        }
-      }
       setShowJson(false)
       setCorrelationId(data?.correlationId || null)
       setHistoryOpen(false)
