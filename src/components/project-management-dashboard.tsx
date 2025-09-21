@@ -111,6 +111,10 @@ export type ProjectDashboardProps = {
   showSidebar?: boolean;
   /** Custom title for messages panel */
   messagesTitle?: string;
+  /** Toggle built-in top stats numbers */
+  showStats?: boolean;
+  /** Toggle filters and view controls row */
+  showControls?: boolean;
   className?: string;
   loading?: boolean;
   emptyProjectsLabel?: string;
@@ -355,6 +359,8 @@ export function ProjectDashboard({
   extraContent,
   showSidebar = true,
   messagesTitle = "Client Messages",
+  showStats = true,
+  showControls = true,
   className = "",
   loading = false,
   emptyProjectsLabel = "No projects match your search.",
@@ -942,129 +948,135 @@ export function ProjectDashboard({
             </div>
           )}
           {/* Controls */}
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-            {/* Stats */}
-            <div className={cx("flex flex-wrap items-center", spacing.gap.md)}>
-              {computedStats.map((s, i) => (
-                <div key={s.id} className={cx("flex items-center", spacing.gap.xs)}>
-                  <span className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-                    {s.value}
-                  </span>
-                  <span className="text-sm text-slate-500 dark:text-slate-400">
-                    {s.label}
-                  </span>
-                  {i < computedStats.length - 1 && (
-                    <span className="ml-4 w-px h-8 bg-slate-200 dark:bg-slate-700" />
-                  )}
+          { (showStats || showControls) && (
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+              {/* Stats */}
+              {showStats && (
+                <div className={cx("flex flex-wrap items-center", spacing.gap.md)}>
+                  {computedStats.map((s, i) => (
+                    <div key={s.id} className={cx("flex items-center", spacing.gap.xs)}>
+                      <span className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                        {s.value}
+                      </span>
+                      <span className="text-sm text-slate-500 dark:text-slate-400">
+                        {s.label}
+                      </span>
+                      {i < computedStats.length - 1 && (
+                        <span className="ml-4 w-px h-8 bg-slate-200 dark:bg-slate-700" />
+                      )}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              )}
 
-            {/* Filters and view toggles */}
-            <div className={cx("flex items-center", spacing.gap.xs)}>
-              <label className="sr-only" htmlFor={statusSelectId}>
-                Filter by status
-              </label>
-              <select
-                id={statusSelectId}
-                value={activeStatusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as ProjectStatus | "all")}
-                className={cx(
-                  "rounded-lg ring-1 ring-slate-200 dark:ring-slate-700",
-                  "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200",
-                  spacing.button.sm
-                )}
-              >
-                <option value="all">All</option>
-                <option value="inProgress">In progress</option>
-                <option value="upcoming">Upcoming</option>
-                <option value="completed">Completed</option>
-                <option value="paused">Paused</option>
-              </select>
+              {/* Filters and view toggles */}
+              {showControls && (
+                <div className={cx("flex items-center", spacing.gap.xs)}>
+                  <label className="sr-only" htmlFor={statusSelectId}>
+                    Filter by status
+                  </label>
+                  <select
+                    id={statusSelectId}
+                    value={activeStatusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value as ProjectStatus | "all")}
+                    className={cx(
+                      "rounded-lg ring-1 ring-slate-200 dark:ring-slate-700",
+                      "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200",
+                      spacing.button.sm
+                    )}
+                  >
+                    <option value="all">All</option>
+                    <option value="inProgress">In progress</option>
+                    <option value="upcoming">Upcoming</option>
+                    <option value="completed">Completed</option>
+                    <option value="paused">Paused</option>
+                  </select>
 
-              <div className={cx("inline-flex items-center", spacing.gap.xs)}>
-                <label className="sr-only" htmlFor="sortBy">Sort by</label>
-                <select
-                  id="sortBy"
-                  value={activeSortBy}
-                  onChange={(e) => setSort(e.target.value as SortBy, activeSortDir)}
-                  className={cx(
-                    "rounded-lg ring-1 ring-slate-200 dark:ring-slate-700",
-                    "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200",
-                    spacing.button.sm
-                  )}
-                >
-                  <option value="manual">Manual</option>
-                  <option value="date">Date</option>
-                  <option value="name">Name</option>
-                  <option value="progress">Progress</option>
-                </select>
-                {activeSortBy !== "manual" && (
+                  <div className={cx("inline-flex items-center", spacing.gap.xs)}>
+                    <label className="sr-only" htmlFor="sortBy">Sort by</label>
+                    <select
+                      id="sortBy"
+                      value={activeSortBy}
+                      onChange={(e) => setSort(e.target.value as SortBy, activeSortDir)}
+                      className={cx(
+                        "rounded-lg ring-1 ring-slate-200 dark:ring-slate-700",
+                        "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200",
+                        spacing.button.sm
+                      )}
+                    >
+                      <option value="manual">Manual</option>
+                      <option value="date">Date</option>
+                      <option value="name">Name</option>
+                      <option value="progress">Progress</option>
+                    </select>
+                    {activeSortBy !== "manual" && (
+                      <button
+                        className={cx(
+                          "p-2 rounded-lg ring-1 ring-slate-200 dark:ring-slate-700",
+                          "bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                        )}
+                        aria-label={`Sort direction: ${activeSortDir}`}
+                        onClick={() => setSort(activeSortBy, activeSortDir === "asc" ? "desc" : "asc")}
+                      >
+                        <Icons.Arrow className={cx("size-4", activeSortDir === "asc" && "rotate-180")} />
+                      </button>
+                    )}
+                  </div>
+
                   <button
                     className={cx(
-                      "p-2 rounded-lg ring-1 ring-slate-200 dark:ring-slate-700",
-                      "bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                      "p-2 rounded-lg ring-1 ring-slate-200 dark:ring-slate-700 transition-colors",
+                      reorderMode 
+                        ? "bg-indigo-100 dark:bg-indigo-900/50 ring-indigo-300 dark:ring-indigo-700"
+                        : "bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700"
                     )}
-                    aria-label={`Sort direction: ${activeSortDir}`}
-                    onClick={() => setSort(activeSortBy, activeSortDir === "asc" ? "desc" : "asc")}
+                    title="Reorder items"
+                    aria-pressed={reorderMode}
+                    onClick={() => {
+                      setReorderMode(!reorderMode);
+                      if (!reorderMode && !canReorder) {
+                        announce("Switch to Manual sort, clear search, and show All to enable reordering.");
+                      } else {
+                        announce(reorderMode ? "Reorder mode off." : "Reorder mode on. Use arrow keys to move items.");
+                      }
+                    }}
+                    disabled={!canReorder}
                   >
-                    <Icons.Arrow className={cx("size-4", activeSortDir === "asc" && "rotate-180")} />
+                    ⇅
                   </button>
-                )}
-              </div>
 
-              <button
-                className={cx(
-                  "p-2 rounded-lg ring-1 ring-slate-200 dark:ring-slate-700 transition-colors",
-                  reorderMode 
-                    ? "bg-indigo-100 dark:bg-indigo-900/50 ring-indigo-300 dark:ring-indigo-700"
-                    : "bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700"
-                )}
-                title="Reorder items"
-                aria-pressed={reorderMode}
-                onClick={() => {
-                  setReorderMode(!reorderMode);
-                  if (!reorderMode && !canReorder) {
-                    announce("Switch to Manual sort, clear search, and show All to enable reordering.");
-                  } else {
-                    announce(reorderMode ? "Reorder mode off." : "Reorder mode on. Use arrow keys to move items.");
-                  }
-                }}
-                disabled={!canReorder}
-              >
-                ⇅
-              </button>
-
-              <div className="inline-flex rounded-lg ring-1 ring-slate-200 dark:ring-slate-700">
-                <button
-                  onClick={() => setView("list")}
-                  className={cx(
-                    "p-2 rounded-l-lg transition-colors",
-                    viewMode === "list"
-                      ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900"
-                      : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                  )}
-                  title="List view"
-                  aria-pressed={viewMode === "list"}
-                >
-                  <Icons.List className="size-5" />
-                </button>
-                <button
-                  onClick={() => setView("grid")}
-                  className={cx(
-                    "p-2 rounded-r-lg transition-colors",
-                    viewMode === "grid"
-                      ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900"
-                      : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700"
-                  )}
-                  title="Grid view"
-                  aria-pressed={viewMode === "grid"}
-                >
-                  <Icons.Grid className="size-5" />
-                </button>
-              </div>
+                  <div className="inline-flex rounded-lg ring-1 ring-slate-200 dark:ring-slate-700">
+                    <button
+                      onClick={() => setView("list")}
+                      className={cx(
+                        "p-2 rounded-l-lg transition-colors",
+                        viewMode === "list"
+                          ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900"
+                          : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                      )}
+                      title="List view"
+                      aria-pressed={viewMode === "list"}
+                    >
+                      <Icons.List className="size-5" />
+                    </button>
+                    <button
+                      onClick={() => setView("grid")}
+                      className={cx(
+                        "p-2 rounded-r-lg transition-colors",
+                        viewMode === "grid"
+                          ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900"
+                          : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700"
+                      )}
+                      title="Grid view"
+                      aria-pressed={viewMode === "grid"}
+                    >
+                      <Icons.Grid className="size-5" />
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
+          )}
 
           {reorderMode && (
             <div className="mb-3 p-3 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 text-sm text-indigo-700 dark:text-indigo-300">

@@ -224,6 +224,8 @@ export default function AdminPage() {
         allowCreate={false}
         messagesTitle="Copys criadas"
         onMessageClick={(m) => setSelectedCopyId(m.id)}
+        showStats={false}
+        showControls={false}
       defaultView="grid"
       defaultSortBy="date"
       defaultSortDir="desc"
