@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Clock, Circle } from "lucide-react"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 
 export interface TimelineItem {
   title: string
@@ -59,6 +61,80 @@ const getStatusIcon = (status: TimelineItem["status"]) => {
 }
 
 export function Timeline({ items, className }: TimelineProps) {
+  const [expandedPreviewByHref, setExpandedPreviewByHref] = React.useState<Record<string, boolean>>({})
+  const [loadingByHref, setLoadingByHref] = React.useState<Record<string, boolean>>({})
+  const [contentCacheByHref, setContentCacheByHref] = React.useState<Record<string, { text: string; error?: string }>>({})
+
+  const isExternalLink = (href?: string) => !!href && /^https?:\/\//i.test(href)
+  const getFileExtension = (href?: string) => (href ? href.split("?")[0].split("#")[0].split(".").pop()?.toLowerCase() : undefined)
+
+  const togglePreview = async (href: string) => {
+    setExpandedPreviewByHref(prev => ({ ...prev, [href]: !prev[href] }))
+    const willOpen = !expandedPreviewByHref[href]
+    if (!willOpen) return
+
+    if (!contentCacheByHref[href]) {
+      try {
+        setLoadingByHref(prev => ({ ...prev, [href]: true }))
+        const res = await fetch(href)
+        if (!res.ok) throw new Error(`Falha ao carregar recurso (${res.status})`)
+        const text = await res.text()
+        setContentCacheByHref(prev => ({ ...prev, [href]: { text } }))
+      } catch (e: any) {
+        setContentCacheByHref(prev => ({ ...prev, [href]: { text: "", error: e?.message || "Erro desconhecido" } }))
+      } finally {
+        setLoadingByHref(prev => ({ ...prev, [href]: false }))
+      }
+    }
+  }
+
+  const renderPreview = (href: string) => {
+    const cached = contentCacheByHref[href]
+    const ext = getFileExtension(href)
+
+    if (loadingByHref[href]) {
+      return (
+        <div className="mt-3 text-xs text-muted-foreground">Carregando pré-visualização...</div>
+      )
+    }
+
+    if (cached?.error) {
+      return (
+        <div className="mt-3 text-xs text-red-600">Erro: {cached.error}</div>
+      )
+    }
+
+    const text = cached?.text || ""
+
+    switch (ext) {
+      case "md":
+      case "mdx":
+        return (
+          <div className="prose prose-sm max-w-none mt-3">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown>
+          </div>
+        )
+      case "json":
+        try {
+          const parsed = JSON.parse(text)
+          return (
+            <pre className="mt-3 overflow-auto rounded-md bg-slate-50 p-3 text-xs text-slate-800 border border-slate-200"><code>{JSON.stringify(parsed, null, 2)}</code></pre>
+          )
+        } catch {
+          return (
+            <pre className="mt-3 overflow-auto rounded-md bg-slate-50 p-3 text-xs text-slate-800 border border-slate-200"><code>{text}</code></pre>
+          )
+        }
+      case "sql":
+      case "mmd":
+      case "txt":
+      default:
+        return (
+          <pre className="mt-3 overflow-auto rounded-md bg-slate-50 p-3 text-xs text-slate-800 border border-slate-200"><code>{text}</code></pre>
+        )
+    }
+  }
+
   if (!items || items.length === 0) {
     return (
       <div className={cn("w-full max-w-4xl mx-auto px-4 sm:px-6 py-8", className)}>
@@ -205,15 +281,27 @@ export function Timeline({ items, className }: TimelineProps) {
 
                         {item.href && (
                           <div className="flex items-center gap-3 mb-4">
-                            <a
-                              className="text-xs font-medium text-slate-700 underline hover:text-slate-900"
-                              href={item.href}
-                              target={item.href.startsWith('http') ? '_blank' : undefined}
-                              rel={item.href.startsWith('http') ? 'noreferrer' : undefined}
-                              aria-label={`Abrir ${item.title}`}
-                            >
-                              Abrir
-                            </a>
+                            {isExternalLink(item.href) ? (
+                              <a
+                                className="text-xs font-medium text-slate-700 underline hover:text-slate-900"
+                                href={item.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label={`Abrir ${item.title} em nova aba`}
+                              >
+                                Abrir
+                              </a>
+                            ) : (
+                              <button
+                                type="button"
+                                className="text-xs font-medium text-slate-700 underline hover:text-slate-900"
+                                onClick={() => togglePreview(item.href!)}
+                                aria-expanded={!!expandedPreviewByHref[item.href!]}
+                                aria-controls={`preview-${index}`}
+                              >
+                                {expandedPreviewByHref[item.href!] ? 'Fechar' : 'Abrir'}
+                              </button>
+                            )}
                             <a
                               className="text-xs font-medium text-slate-700 underline hover:text-slate-900"
                               href={item.href}
@@ -222,6 +310,12 @@ export function Timeline({ items, className }: TimelineProps) {
                             >
                               Download
                             </a>
+                          </div>
+                        )}
+
+                        {item.href && !isExternalLink(item.href) && expandedPreviewByHref[item.href] && (
+                          <div id={`preview-${index}`} className="mt-2">
+                            {renderPreview(item.href)}
                           </div>
                         )}
 
