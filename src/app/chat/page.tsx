@@ -9,7 +9,6 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { Send, MessageSquare, FileText, Loader2, Clock } from 'lucide-react'
-import { useAnimatedText } from '@/components/ui/animated-text'
 
 type CopyItem = {
   id: string
@@ -48,12 +47,7 @@ export default function ChatPage() {
     return list.length ? list[list.length - 1] : null
   }, [messages])
 
-  const latestAssistant = useMemo(() => {
-    const list = messages.filter((m) => m.role === 'assistant')
-    return list.length ? list[list.length - 1] : null
-  }, [messages])
-
-  const animatedAssistant = useAnimatedText(latestAssistant?.content || '', ' ')
+  const [showCurrentText, setShowCurrentText] = useState(false)
 
   const loadCopies = async () => {
     setLoadingCopies(true)
@@ -243,28 +237,23 @@ export default function ChatPage() {
                   <div className="text-sm text-slate-500">Selecione uma copy na coluna esquerda para conversar.</div>
                 ) : (
                   <div className="flex flex-col h-[70vh]">
-                    {/* Painel de comparação: texto atual (usuário) x resposta IA */}
-                    <div className="grid gap-4 sm:grid-cols-2 mb-4">
-                      <Card className="bg-white border-slate-200">
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-sm">Texto atual</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="min-h-[96px] max-h-64 overflow-auto whitespace-pre-wrap text-sm">
-                            {improvedLead || latestUser?.content || '—'}
-                          </div>
-                        </CardContent>
-                      </Card>
-                      <Card className="bg-white border-slate-200">
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-sm">Resposta da IA</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="min-h-[96px] max-h-64 overflow-auto whitespace-pre-wrap text-sm">
-                            {animatedAssistant || '—'}
-                          </div>
-                        </CardContent>
-                      </Card>
+                    {/* Texto atual (colapsável) */}
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm font-medium text-slate-700">Texto atual</div>
+                        <Button variant="outline" size="sm" onClick={() => setShowCurrentText((v) => !v)}>
+                          {showCurrentText ? 'Esconder' : 'Mostrar'}
+                        </Button>
+                      </div>
+                      {showCurrentText && (
+                        <Card className="mt-2 bg-white border-slate-200">
+                          <CardContent className="pt-4">
+                            <div className="max-h-40 overflow-auto whitespace-pre-wrap text-sm text-slate-700">
+                              {improvedLead || latestUser?.content || '—'}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
                     </div>
                     <div ref={scrollRef} className="flex-1 overflow-auto pr-4">
                       <div className="space-y-3">
