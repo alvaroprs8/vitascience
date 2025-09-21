@@ -41,6 +41,7 @@ export default function LeadPage() {
   const [result, setResult] = useState<any>(null)
   const [configured, setConfigured] = useState<boolean | null>(null)
   const [improvedLead, setImprovedLead] = useState('')
+  const [originalLead, setOriginalLead] = useState('')
   const [showJson, setShowJson] = useState(false)
   const [correlationId, setCorrelationId] = useState<string | null>(null)
   const [isWaiting, setIsWaiting] = useState(false)
@@ -175,10 +176,14 @@ export default function LeadPage() {
         startPolling(data.correlationId)
         setResult(null)
         setImprovedLead('')
+        setOriginalLead(lead)
       } else if (data) {
         setResult(data)
         const improved = extractImprovedLeadFromJson(data)
         setImprovedLead(typeof improved === 'string' ? improved : '')
+        if (typeof (data as any)?.originalLead === 'string') {
+          setOriginalLead((data as any).originalLead)
+        }
       } else {
         const text = await res.text()
         setResult({ raw: text })
@@ -209,6 +214,9 @@ export default function LeadPage() {
           setImprovedLead(typeof data.improvedLead === 'string' && data.improvedLead.trim()
             ? data.improvedLead
             : extractImprovedLeadFromJson(data) || '')
+          if (typeof data.originalLead === 'string' && data.originalLead.trim()) {
+            setOriginalLead(data.originalLead)
+          }
           clearInterval(timer)
         }
       } catch {
@@ -284,6 +292,9 @@ export default function LeadPage() {
       setResult(data)
       const improved = extractImprovedLeadFromJson(data)
       setImprovedLead(typeof improved === 'string' ? improved : '')
+      if (typeof (data as any)?.originalLead === 'string') {
+        setOriginalLead((data as any).originalLead)
+      }
       setShowJson(false)
       setCorrelationId(data?.correlationId || null)
       setHistoryOpen(false)
@@ -460,6 +471,7 @@ export default function LeadPage() {
                     setResult(null); 
                     setError(null);
                     setImprovedLead('');
+                    setOriginalLead('');
                   }}
                   className="gap-2"
                 >
@@ -820,8 +832,8 @@ export default function LeadPage() {
                         </CardHeader>
                         <CardContent>
                           <Textarea
-                            value={lead}
-                            onChange={(e) => setLead(e.target.value)}
+                            value={originalLead}
+                            onChange={(e) => setOriginalLead(e.target.value)}
                             className="min-h-64 resize-y"
                           />
                         </CardContent>

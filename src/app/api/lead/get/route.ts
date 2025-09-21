@@ -21,6 +21,7 @@ export async function GET(request: NextRequest) {
     return Response.json({
       status: data.status,
       improvedLead: data.improved_lead || undefined,
+      originalLead: data.original_lead || undefined,
       data: data.data || undefined,
       receivedAt: data.received_at ? new Date(data.received_at).getTime() : null,
       correlationId: data.correlation_id,
