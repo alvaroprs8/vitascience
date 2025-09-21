@@ -18,10 +18,10 @@ import { SaaSLayout } from "@/components/layouts/SaaSLayout"
 export default function AdminPage() {
   // Mock: copywriters top performance, copys, clones, status breakdown
   const stats: Stat[] = [
-    { id: "topCopywriters", label: "Top Copywriters", value: 5 },
-    { id: "bestCopys", label: "Best Copys", value: 12 },
-    { id: "activeCopys", label: "Active Copys", value: 28 },
-    { id: "clonesUsed", label: "Clones Used", value: 7 },
+    { id: "topCopywriters", label: "Copywriters com melhor performance", value: 5 },
+    { id: "bestCopys", label: "Melhores copys", value: 12 },
+    { id: "activeCopys", label: "Copys ativas", value: 28 },
+    { id: "clonesUsed", label: "Clones usados", value: 7 },
   ]
 
   const projects: Project[] = [
@@ -221,6 +221,7 @@ export default function AdminPage() {
         { id: "settings", label: "Settings" },
       ]}
         showSidebar={false}
+        allowCreate={false}
         messagesTitle="Copys criadas"
         onMessageClick={(m) => setSelectedCopyId(m.id)}
       defaultView="grid"
@@ -273,7 +274,7 @@ export default function AdminPage() {
 
           {/* Bar Chart: Top Copywriters por CVR */}
           <div className="rounded-xl bg-white dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700 p-4">
-            <p className="text-sm font-medium text-slate-900 dark:text-slate-100 mb-3">Top Copywriters (CVR)</p>
+             <p className="text-sm font-medium text-slate-900 dark:text-slate-100 mb-3">Copywriters com maior CVR</p>
             <div style={{ width: "100%", height: 220 }}>
               <ResponsiveContainer>
                 <BarChart data={current.cvrByWriter} margin={{ top: 5, right: 12, bottom: 0, left: -10 }}>
@@ -289,7 +290,7 @@ export default function AdminPage() {
 
           {/* Bar Chart: Clones mais usados */}
           <div className="rounded-xl bg-white dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700 p-4 lg:col-span-3">
-            <p className="text-sm font-medium text-slate-900 dark:text-slate-100 mb-3">Clones mais usados (7d)</p>
+             <p className="text-sm font-medium text-slate-900 dark:text-slate-100 mb-3">Clones mais usados (7 dias)</p>
             <div style={{ width: "100%", height: 240 }}>
               <ResponsiveContainer>
                 <BarChart data={current.clonesUsage} margin={{ top: 5, right: 12, bottom: 0, left: -10 }}>

@@ -16,7 +16,7 @@ export function SaaSLayout({ children }: SaaSLayoutProps) {
   ] as const;
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-white to-slate-50">
+    <div className="min-h-screen w-full bg-[#fefefe]">
       <main className="mx-auto max-w-[1400px] px-6 py-8 sm:px-8">
         {children}
       </main>

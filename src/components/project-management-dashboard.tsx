@@ -845,18 +845,7 @@ export function ProjectDashboard({
         </div>
 
         <div className={cx("flex items-center", spacing.gap.xs)}>
-          {allowCreate && (
-            <button
-              className={cx(
-                "rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 transition-colors",
-                spacing.button.md
-              )}
-              onClick={() => setCreateOpen(true)}
-            >
-              <span className="hidden sm:inline">New Project</span>
-              <Icons.Plus className="size-5 sm:hidden" />
-            </button>
-          )}
+          {/* New Project button disabled via allowCreate prop */}
 
           {showThemeToggle && (
             <button
