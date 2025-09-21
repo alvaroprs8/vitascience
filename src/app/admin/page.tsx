@@ -260,10 +260,10 @@ export default function AdminPage() {
             <p className="text-sm font-medium text-slate-900 dark:text-slate-100 mb-3">CTR por dia (últimos 14 dias)</p>
             <div style={{ width: "100%", height: 220 }}>
               <ResponsiveContainer>
-                <LineChart data={current.ctrSeries.map((v, i) => ({ d: i === current.ctrSeries.length - 1 ? "Hoje" : `D-${current.ctrSeries.length - 1 - i}`, ctr: v }))} margin={{ top: 5, right: 12, bottom: 0, left: -10 }}>
+                <LineChart data={current.ctrSeries.map((v: number, i: number) => ({ d: i === current.ctrSeries.length - 1 ? "Hoje" : `D-${current.ctrSeries.length - 1 - i}`, ctr: v }))} margin={{ top: 5, right: 12, bottom: 0, left: -10 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                   <XAxis dataKey="d" tick={{ fontSize: 12, fill: "#64748b" }} axisLine={false} tickLine={false} />
-                  <YAxis tickFormatter={(v) => `${v}%`} tick={{ fontSize: 12, fill: "#64748b" }} axisLine={false} tickLine={false} width={40} />
+                  <YAxis tickFormatter={(v: number) => `${v}%`} tick={{ fontSize: 12, fill: "#64748b" }} axisLine={false} tickLine={false} width={40} />
                   <Tooltip formatter={(v: any) => [`${v}%`, "CTR"]} labelStyle={{ color: "#0f172a" }} />
                   <Line type="monotone" dataKey="ctr" stroke="#6366f1" strokeWidth={2} dot={false} />
                 </LineChart>
@@ -279,7 +279,7 @@ export default function AdminPage() {
                 <BarChart data={current.cvrByWriter} margin={{ top: 5, right: 12, bottom: 0, left: -10 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                   <XAxis dataKey="name" tick={{ fontSize: 12, fill: "#64748b" }} axisLine={false} tickLine={false} />
-                  <YAxis tickFormatter={(v) => `${v}%`} tick={{ fontSize: 12, fill: "#64748b" }} axisLine={false} tickLine={false} width={40} />
+                  <YAxis tickFormatter={(v: number) => `${v}%`} tick={{ fontSize: 12, fill: "#64748b" }} axisLine={false} tickLine={false} width={40} />
                   <Tooltip formatter={(v: any) => [`${v}%`, "CVR"]} labelStyle={{ color: "#0f172a" }} />
                   <Bar dataKey="cvr" fill="#10b981" radius={[6, 6, 0, 0]} />
                 </BarChart>
