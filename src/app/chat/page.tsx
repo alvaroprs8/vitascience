@@ -9,6 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { Send, MessageSquare, FileText, Loader2, Clock } from 'lucide-react'
+import { SaaSLayout } from '@/components/layouts/SaaSLayout'
 
 type CopyItem = {
   id: string
@@ -208,6 +209,7 @@ export default function ChatPage() {
   }
 
   return (
+    <SaaSLayout>
     <div className="min-h-screen bg-gradient-to-b from-white to-slate-50 py-6">
       <div className="container mx-auto px-4 sm:px-6">
         {/* Carrossel de copies no topo */}
@@ -362,6 +364,7 @@ export default function ChatPage() {
         </div>
       </div>
     </div>
+    </SaaSLayout>
   )
 }
 
