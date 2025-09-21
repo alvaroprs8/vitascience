@@ -125,10 +125,17 @@ export default function ChatPage() {
     if (!input.trim()) return
     setIsSending(true)
     try {
+      const contextPayload = messages.map((m) => ({ role: m.role, content: m.content }))
+      const improvedLeadPayload = improvedLead || latestUser?.content || ''
       const res = await fetch('/api/chat/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ copyId: selectedCopyId, message: input.trim() })
+        body: JSON.stringify({
+          copyId: selectedCopyId,
+          message: input.trim(),
+          context: contextPayload,
+          improvedLead: improvedLeadPayload,
+        })
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data?.error || 'Falha ao enviar')

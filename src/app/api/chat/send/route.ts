@@ -21,6 +21,8 @@ export async function POST(request: NextRequest) {
 
     const copyId: string | undefined = body?.copyId
     const message: string | undefined = body?.message
+    const context: Array<{ role: string; content: string }> | undefined = Array.isArray(body?.context) ? body.context : undefined
+    const improvedLead: string | undefined = typeof body?.improvedLead === 'string' ? body.improvedLead : undefined
     if (!copyId || !String(copyId).trim()) {
       return Response.json({ error: 'copyId is required' }, { status: 400 })
     }
@@ -74,6 +76,8 @@ export async function POST(request: NextRequest) {
       message,
       messageCorrelationId,
       callbackUrl,
+      context,
+      improvedLead,
     }
 
     const chatResponse = await fetch(chatWebhookUrl, {
