@@ -280,7 +280,7 @@ export default function ChatPage() {
                   <div className="text-sm text-slate-500">Selecione uma copy na coluna esquerda para conversar.</div>
                 ) : (
                   <div className="grid gap-4 sm:grid-cols-3 h-[70vh] min-w-0">
-                    <div className="sm:col-span-1 flex flex-col min-w-0">
+                    <div className="sm:col-span-1 flex flex-col min-w-0 max-h-[70vh]">
                       {showCurrentText && (
                         <Card className="bg-white border-slate-200 h-full overflow-hidden">
                           <CardHeader className="pb-2">
@@ -288,7 +288,7 @@ export default function ChatPage() {
                           </CardHeader>
                           <CardContent className="flex-1 flex flex-col gap-2 min-h-0 overflow-hidden">
                             <textarea
-                              className="w-full flex-1 min-h-[200px] max-h-full resize-none rounded-md border border-slate-200 p-2 text-sm overflow-auto"
+                              className="w-full flex-1 min-h-[200px] max-h-[60vh] resize-none rounded-md border border-slate-200 p-2 text-sm overflow-y-auto"
                               value={editedLead}
                               onChange={(e) => setEditedLead(e.target.value)}
                               placeholder="Edite a lead aqui..."
@@ -303,8 +303,8 @@ export default function ChatPage() {
                         </Card>
                       )}
                     </div>
-                    <div className="sm:col-span-2 flex flex-col min-w-0">
-                      <div ref={scrollRef} className="flex-1 overflow-auto overflow-x-hidden pr-4 min-w-0">
+                    <div className="sm:col-span-2 flex flex-col min-w-0 max-h-[70vh]">
+                      <div ref={scrollRef} className="flex-1 overflow-y-auto overflow-x-hidden pr-4 min-w-0 max-h-[60vh]">
                         <div className="space-y-3">
                           {isLoadingMessages && (
                             <div className="text-sm text-slate-500 flex items-center gap-2">
