@@ -1,8 +1,8 @@
 import { NextRequest } from 'next/server'
-import { supabaseAdmin } from '@/services/supabase'
 import { randomUUID } from 'crypto'
 
 export const dynamic = 'force-dynamic'
+export const maxDuration = 300
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,19 +39,6 @@ export async function POST(request: NextRequest) {
     }
 
     const asyncPayload = { ...baseInput, correlationId, callbackUrl }
-
-    // Persist initial record so we can retrieve the original lead later
-    try {
-      await supabaseAdmin
-        .from('lead_results')
-        .upsert({
-          correlation_id: correlationId,
-          status: 'processing',
-          improved_lead: null,
-          data: baseInput,
-          received_at: new Date().toISOString(),
-        }, { onConflict: 'correlation_id' })
-    } catch {}
 
     const n8nResponse = await fetch(n8nUrl, {
       method: 'POST',

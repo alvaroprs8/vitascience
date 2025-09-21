@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { supabaseAdmin } from '@/services/supabase'
 
 export const dynamic = 'force-dynamic'
+export const maxDuration = 300
 
 export async function GET(request: NextRequest) {
   try {
