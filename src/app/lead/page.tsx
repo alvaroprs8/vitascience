@@ -834,7 +834,7 @@ export default function LeadPage() {
                           <Textarea
                             value={originalLead}
                             onChange={(e) => setOriginalLead(e.target.value)}
-                            className="min-h-64 resize-y"
+                            className="h-48 overflow-y-auto resize-none"
                           />
                         </CardContent>
                       </Card>
@@ -846,7 +846,7 @@ export default function LeadPage() {
                           <Textarea
                             value={improvedLead}
                             onChange={(e) => setImprovedLead(e.target.value)}
-                            className="min-h-64 resize-y"
+                            className="h-48 overflow-y-auto resize-none"
                           />
                         </CardContent>
                       </Card>
