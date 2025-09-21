@@ -335,9 +335,14 @@ export default function LeadPage() {
       setResult(data)
       const improved = extractImprovedLeadFromJson(data)
       setImprovedLead(typeof improved === 'string' ? improved : '')
-      const original = extractOriginalLeadFromJson(data)
-      if (typeof original === 'string' && original.trim()) {
-        setLead(original)
+      const originalFromApi = (data as any)?.originalLead
+      if (typeof originalFromApi === 'string' && originalFromApi.trim()) {
+        setLead(originalFromApi)
+      } else {
+        const original = extractOriginalLeadFromJson(data)
+        if (typeof original === 'string' && original.trim()) {
+          setLead(original)
+        }
       }
       setShowJson(false)
       setCorrelationId(data?.correlationId || null)
