@@ -342,6 +342,7 @@ export function ProjectDashboard({
   onProjectCreate,
   generateId,
   onMessageStarChange,
+  onMessageClick,
   // Theme
   showThemeToggle = true,
   onToggleTheme,
