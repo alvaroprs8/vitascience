@@ -279,8 +279,8 @@ export default function ChatPage() {
                 {!selectedCopyId ? (
                   <div className="text-sm text-slate-500">Selecione uma copy na coluna esquerda para conversar.</div>
                 ) : (
-                  <div className="grid gap-4 sm:grid-cols-3 h-[70vh]">
-                    <div className="sm:col-span-1 flex flex-col">
+                  <div className="grid gap-4 sm:grid-cols-3 h-[70vh] min-w-0">
+                    <div className="sm:col-span-1 flex flex-col min-w-0">
                       {showCurrentText && (
                         <Card className="bg-white border-slate-200 h-full overflow-hidden">
                           <CardHeader className="pb-2">
@@ -303,8 +303,8 @@ export default function ChatPage() {
                         </Card>
                       )}
                     </div>
-                    <div className="sm:col-span-2 flex flex-col">
-                      <div ref={scrollRef} className="flex-1 overflow-auto pr-4">
+                    <div className="sm:col-span-2 flex flex-col min-w-0">
+                      <div ref={scrollRef} className="flex-1 overflow-auto overflow-x-hidden pr-4 min-w-0">
                         <div className="space-y-3">
                           {isLoadingMessages && (
                             <div className="text-sm text-slate-500 flex items-center gap-2">
@@ -312,8 +312,8 @@ export default function ChatPage() {
                             </div>
                           )}
                           {messages.map((m) => (
-                            <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                              <div className={`max-w-[80%] rounded-lg px-3 py-2 text-sm whitespace-pre-wrap break-words ${m.role === 'user' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-900'}`}>
+                            <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} min-w-0`}>
+                              <div className={`max-w-[80%] rounded-lg px-3 py-2 text-sm whitespace-pre-wrap break-all overflow-x-hidden ${m.role === 'user' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-900'}`}>
                                 {m.content}
                               </div>
                             </div>
