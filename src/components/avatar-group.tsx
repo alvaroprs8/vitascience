@@ -30,6 +30,8 @@ const Avatar = ({
   isHovered,
   onHover,
   onLeave,
+  onClick,
+  selected,
 }: {
   item: AvatarItem;
   index: number;
