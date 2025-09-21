@@ -282,13 +282,13 @@ export default function ChatPage() {
                   <div className="grid gap-4 sm:grid-cols-3 h-[70vh]">
                     <div className="sm:col-span-1 flex flex-col">
                       {showCurrentText && (
-                        <Card className="bg-white border-slate-200 h-full">
+                        <Card className="bg-white border-slate-200 h-full overflow-hidden">
                           <CardHeader className="pb-2">
                             <CardTitle className="text-sm">Texto atual</CardTitle>
                           </CardHeader>
-                          <CardContent className="flex-1 flex flex-col gap-2 min-h-0">
+                          <CardContent className="flex-1 flex flex-col gap-2 min-h-0 overflow-hidden">
                             <textarea
-                              className="w-full flex-1 min-h-[200px] max-h-full resize-none rounded-md border border-slate-200 p-2 text-sm"
+                              className="w-full flex-1 min-h-[200px] max-h-full resize-none rounded-md border border-slate-200 p-2 text-sm overflow-auto"
                               value={editedLead}
                               onChange={(e) => setEditedLead(e.target.value)}
                               placeholder="Edite a lead aqui..."
@@ -313,7 +313,7 @@ export default function ChatPage() {
                           )}
                           {messages.map((m) => (
                             <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                              <div className={`max-w-[80%] rounded-lg px-3 py-2 text-sm whitespace-pre-wrap ${m.role === 'user' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-900'}`}>
+                              <div className={`max-w-[80%] rounded-lg px-3 py-2 text-sm whitespace-pre-wrap break-words ${m.role === 'user' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-900'}`}>
                                 {m.content}
                               </div>
                             </div>
