@@ -346,11 +346,11 @@ export default function LeadPage() {
             <div className="flex flex-col gap-3">
               <AvatarGroup
                 items={[
-                  { id: 1, name: 'Eugene Schwartz', designation: 'Níveis de consciência', image: 'https://i.pravatar.cc/96?img=21', available: true },
-                  { id: 2, name: 'Alex Hormozi', designation: 'Ofertas e valor', image: 'https://i.pravatar.cc/96?img=22', available: false },
-                  { id: 3, name: 'Gary Halbert', designation: 'Direto e persuasivo', image: 'https://i.pravatar.cc/96?img=23', available: false },
-                  { id: 4, name: 'Dan Kennedy', designation: 'Resposta direta', image: 'https://i.pravatar.cc/96?img=24', available: false },
-                  { id: 5, name: 'David Ogilvy', designation: 'Branding e pesquisa', image: 'https://i.pravatar.cc/96?img=25', available: false },
+                  { id: 1, name: 'Eugene Schwartz', designation: 'Níveis de consciência', image: '/clones/eugene-schwartz.png', available: true },
+                  { id: 2, name: 'Alex Hormozi', designation: 'Ofertas e valor', image: '/clones/hormozi.png', available: false },
+                  { id: 3, name: 'Gary Halbert', designation: 'Direto e persuasivo', image: '/clones/Gary-Halbert.png', available: false },
+                  { id: 4, name: 'Dan Kennedy', designation: 'Resposta direta', image: '/clones/dan.png', available: false },
+                  { id: 5, name: 'David Ogilvy', designation: 'Branding e pesquisa', image: '/clones/oglivy.png', available: false },
                 ]}
                 maxVisible={5}
                 size="lg"
