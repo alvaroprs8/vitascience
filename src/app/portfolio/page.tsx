@@ -87,6 +87,7 @@ export default function PortfolioVitascience() {
 							description: item.done ? "Entregável concluído" : "Entregável pendente",
 							status: item.done ? "completed" : "upcoming",
 							category: section.section,
+							href: item.href,
 						}))}
 					/>
 				</section>

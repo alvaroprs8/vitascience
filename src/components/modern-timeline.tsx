@@ -14,6 +14,7 @@ export interface TimelineItem {
   image?: string
   status?: "completed" | "current" | "upcoming"
   category?: string
+  href?: string
 }
 
 export interface TimelineProps {
@@ -201,6 +202,28 @@ export function Timeline({ items, className }: TimelineProps) {
                         >
                           {item.description}
                         </motion.p>
+
+                        {item.href && (
+                          <div className="flex items-center gap-3 mb-4">
+                            <a
+                              className="text-xs font-medium text-slate-700 underline hover:text-slate-900"
+                              href={item.href}
+                              target={item.href.startsWith('http') ? '_blank' : undefined}
+                              rel={item.href.startsWith('http') ? 'noreferrer' : undefined}
+                              aria-label={`Abrir ${item.title}`}
+                            >
+                              Abrir
+                            </a>
+                            <a
+                              className="text-xs font-medium text-slate-700 underline hover:text-slate-900"
+                              href={item.href}
+                              download
+                              aria-label={`Baixar ${item.title}`}
+                            >
+                              Download
+                            </a>
+                          </div>
+                        )}
 
                         <div 
                           className="h-1 bg-muted rounded-full overflow-hidden"
