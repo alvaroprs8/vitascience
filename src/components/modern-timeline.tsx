@@ -110,19 +110,42 @@ export function Timeline({ items, className }: TimelineProps) {
       case "md":
       case "mdx":
         return (
-          <div className="prose prose-sm max-w-none mt-3">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown>
+          <div className="mt-3 overflow-hidden rounded-md border border-slate-200 bg-white">
+            <div className="prose prose-slate prose-sm max-w-none leading-relaxed break-words prose-a:break-words prose-img:max-w-full prose-pre:bg-slate-50 prose-pre:whitespace-pre-wrap prose-pre:break-words p-4">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  table: ({ node, ...props }) => (
+                    <div className="overflow-auto max-w-full">
+                      <table className="min-w-full" {...props} />
+                    </div>
+                  ),
+                  a: ({ href, children, ...props }) => (
+                    <a
+                      href={href}
+                      target={href && /^https?:\/\//i.test(href) ? "_blank" : undefined}
+                      rel={href && /^https?:\/\//i.test(href) ? "noopener noreferrer" : undefined}
+                      {...props}
+                    >
+                      {children}
+                    </a>
+                  )
+                }}
+              >
+                {text}
+              </ReactMarkdown>
+            </div>
           </div>
         )
       case "json":
         try {
           const parsed = JSON.parse(text)
           return (
-            <pre className="mt-3 overflow-auto rounded-md bg-slate-50 p-3 text-xs text-slate-800 border border-slate-200"><code>{JSON.stringify(parsed, null, 2)}</code></pre>
+            <pre className="mt-3 overflow-auto max-h-96 rounded-md bg-slate-50 p-3 text-xs text-slate-800 border border-slate-200 whitespace-pre-wrap break-words"><code>{JSON.stringify(parsed, null, 2)}</code></pre>
           )
         } catch {
           return (
-            <pre className="mt-3 overflow-auto rounded-md bg-slate-50 p-3 text-xs text-slate-800 border border-slate-200"><code>{text}</code></pre>
+            <pre className="mt-3 overflow-auto max-h-96 rounded-md bg-slate-50 p-3 text-xs text-slate-800 border border-slate-200 whitespace-pre-wrap break-words"><code>{text}</code></pre>
           )
         }
       case "sql":
@@ -130,7 +153,7 @@ export function Timeline({ items, className }: TimelineProps) {
       case "txt":
       default:
         return (
-          <pre className="mt-3 overflow-auto rounded-md bg-slate-50 p-3 text-xs text-slate-800 border border-slate-200"><code>{text}</code></pre>
+          <pre className="mt-3 overflow-auto max-h-96 rounded-md bg-slate-50 p-3 text-xs text-slate-800 border border-slate-200 whitespace-pre-wrap break-words"><code>{text}</code></pre>
         )
     }
   }
