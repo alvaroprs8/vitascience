@@ -127,6 +127,12 @@ export default function ChatPage() {
     try {
       const contextPayload = messages.map((m) => ({ role: m.role, content: m.content }))
       const improvedLeadPayload = improvedLead || latestUser?.content || ''
+      const formattedHistory = messages
+        .map((m) => {
+          const label = m.role === 'user' ? 'Usuário' : m.role === 'assistant' ? 'Assistente' : 'Sistema'
+          return `${label}: ${m.content}`
+        })
+        .join('\n\n')
       const res = await fetch('/api/chat/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -135,6 +141,7 @@ export default function ChatPage() {
           message: input.trim(),
           context: contextPayload,
           improvedLead: improvedLeadPayload,
+          history: formattedHistory,
         })
       })
       const data = await res.json()
