@@ -1,218 +1,183 @@
-# Igniter.js Starter: Next.js Full-Stack App
+# Vitascience – Sistema de Análise de Copy com Chat de Clones (múltiplos)
 
-[![Next.js](https://img.shields.io/badge/Next.js-15-blue.svg)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-19-blue.svg)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0%2B-blue.svg)](https://www.typescriptlang.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+Este repositório contém um sistema completo para análise de leads de VSL e interação via chat com clones de especialistas (múltiplos personas), integrando Next.js, Supabase, n8n, Redis e Igniter.js.
 
-Welcome to the Igniter.js starter for building full-stack, type-safe applications with **Next.js**. This template provides a solid foundation for creating modern, high-performance web applications featuring server components, client components, and an end-to-end type-safe API layer.
+## Sumário
+- Visão Geral
+- Arquitetura e Componentes
+- Requisitos e Setup
+- Variáveis de Ambiente
+- Banco de Dados
+- Funcionalidades
+  - Chat com Clones (AI Chat multi-persona)
+  - Análise de Lead da Copy (Workflow assíncrono)
+  - Dashboard de Performance das Copys
+- Seleção de Clones (como funciona)
+- Rotas de API
+- Operação e Observabilidade
+- Segurança
+- Roadmap de Melhorias
 
-## Features
+## Visão Geral
+O sistema permite:
+- Enviar uma lead de VSL para análise e melhoria (assíncrono via n8n).
+- Conversar com diferentes clones (personas) sobre uma copy específica, com histórico persistido.
+- Visualizar um dashboard das copys processadas e gerenciar o texto melhorado.
 
--   **Next.js App Router**: A full-featured application built using the latest Next.js conventions.
--   **End-to-End Type Safety**: Powered by Igniter.js, ensuring type safety between your React components and your back-end API.
--   **Feature-Based Architecture**: A scalable project structure that organizes code by business domain.
--   **Ready-to-Use Services**: Pre-configured examples for:
-    -   **Caching**: Integrated with Redis via `@igniter-js/adapter-redis`.
-    -   **Background Jobs**: Asynchronous task processing with BullMQ via `@igniter-js/adapter-bullmq`.
-    -   **Structured Logging**: Production-ready logging.
--   **Database Ready**: Comes with Prisma set up for seamless database integration.
--   **Seamless Integration**: Uses the `nextRouteHandlerAdapter` to cleanly connect the Igniter.js router to the Next.js App Router.
--   **UI Components**: Includes a set of UI components from `shadcn/ui` to get you started quickly.
+A decisão de qual clone/persona responder é feita no workflow do n8n com base nos metadados da copy e/ou regras do fluxo. O estado e resultados ficam no Supabase (PostgreSQL). Redis é utilizado para store/filas e o roteamento/datatypes são padronizados com Igniter.js.
 
-## Artefatos
+## Arquitetura e Componentes
+- App: Next.js 15 (App Router), React 19, Tailwind 4, Radix UI.
+- API: Endpoints REST em `/api/*` para submit/callback/consulta.
+- Orquestração: n8n via `N8N_WEBHOOK_URL` (análise) e `N8N_CHAT_WEBHOOK_URL` (chat, obrigatório).
+- Banco: Supabase Postgres (tabelas `lead_results`, `chat_messages`).
+- Cache/Filas: Redis + BullMQ (store e jobs utilitários).
+- Roteador/Cliente: Igniter.js gera client tipado e expõe `/api/v1/*`.
+- MCP (opcional): servidor MCP exposto em `/api/mcp/[transport]`.
 
-- Artefatos públicos em `public/deliverables/` (concepção, prompts, diagrama Mermaid, DDL, validação, Loom, workflow n8n). A navegação direta pela UI foi removida.
+## Requisitos e Setup
+1) Node.js 20+, PNPM/npm.
+2) Banco Postgres (Supabase) e Redis acessíveis por URL.
+3) n8n com workflows configurados para receber webhooks e enviar callbacks.
 
-## Prerequisites
-
-Before you begin, ensure you have the following installed:
-
--   [Node.js](https://nodejs.org/en) (v18 or higher)
--   [npm](https://www.npmjs.com/) or a compatible package manager
--   A running [Redis](https://redis.io/docs/getting-started/) instance (for caching and background jobs).
--   A PostgreSQL database (or you can configure Prisma for a different one).
-
-## Getting Started
-
-Follow these steps to get your project up and running:
-
-1.  **Clone the Repository**
-    ```bash
-    git clone https://github.com/felipebarcelospro/igniter-js.git
-    cd igniter-js/apps/starter-next-app
-    ```
-
-2.  **Install Dependencies**
-    ```bash
-    npm install
-    ```
-
-3.  **Configure Environment Variables**
-    Create a `.env` file in the root of this starter (`igniter-js/apps/starter-next-app/.env`) and add your database and Redis connection URLs:
-
-    ```env
-    # .env
-    DATABASE_URL="postgresql://user:password@localhost:5432/mydatabase?schema=public"
-    REDIS_URL="redis://127.0.0.1:6379"
-    ```
-
-4.  **Run Database Migrations**
-    ```bash
-    npx prisma db push
-    ```
-
-5.  **Run the Development Server**
-    ```bash
-    npm run dev
-    ```
-    This command starts the Next.js development server with Turbopack. Your application will be available at `http://localhost:3000`.
-
-## How It Works
-
-This starter deeply integrates Igniter.js with the Next.js App Router.
-
-### 1. The Next.js API Route Handler
-
-The entry point for all API requests is the catch-all route handler located at `src/app/api/v1/[[...all]]/route.ts`. This file uses the `nextRouteHandlerAdapter` from Igniter.js to expose the entire API.
-
-```typescript
-// src/app/api/v1/[[...all]]/route.ts
-import { AppRouter } from '@/igniter.router'
-import { nextRouteHandlerAdapter } from '@igniter-js/core/adapters'
-
-// The adapter creates GET, POST, etc. handlers from your Igniter.js router.
-export const { GET, POST, PUT, DELETE } = nextRouteHandlerAdapter(AppRouter)
+Instalação:
+```bash
+npm install
 ```
 
-### 2. The Igniter.js API Layer
-
-The back-end API logic is defined using Igniter.js.
-
--   **Initialization (`src/igniter.ts`)**: This is where the core Igniter instance is created and configured with adapters for the store (Redis), jobs (BullMQ), logging, and telemetry.
--   **Router (`src/igniter.router.ts`)**: This file defines all API controllers.
--   **Controllers (`src/features/[feature]/controllers/`)**: Controllers group related API actions (`query` and `mutation`). This is where your business logic lives.
-
-### 3. Type-Safe Client & React Hooks
-
-Igniter.js automatically generates a type-safe client based on your API router.
-
--   The `api` object in `src/igniter.client.ts` is your gateway to the back-end.
--   You can call your API endpoints from both Server Components and Client Components with full type safety.
-
-**Server Component Usage:**
-
-```tsx
-// app/some-server-page/page.tsx
-import { api } from '@/igniter.client';
-
-export default async function SomePage() {
-  // Direct, type-safe API call
-  const data = await api.example.health.query();
-  return <div>Status: {data.status}</div>;
-}
+Desenvolvimento:
+```bash
+npm run dev
 ```
 
-**Client Component Usage:**
-
-```tsx
-// components/SomeClientComponent.tsx
-'use client';
-import { api } from '@/igniter.client';
-
-export function SomeClientComponent() {
-  // Type-safe hook for data fetching, caching, and revalidation
-  const { data, isLoading } = api.example.health.useQuery();
-
-  if (isLoading) return <div>Loading...</div>;
-  return <div>Status: {data?.status}</div>;
-}
+Build/Produção:
+```bash
+npm run build
+npm start
 ```
 
-## Project Structure
+## Variáveis de Ambiente
+Crie um arquivo `.env.local` com as chaves abaixo (exemplos):
+```bash
+# Supabase
+SUPABASE_URL=...                   # URL do seu projeto
+SUPABASE_SERVICE_ROLE_KEY=...      # Chave de service role (servidor)
+NEXT_PUBLIC_SUPABASE_URL=...       # URL pública
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...  # Chave pública anon
 
-The project follows a feature-based architecture combined with Next.js conventions.
+# n8n (workflows)
+N8N_WEBHOOK_URL=https://n8n.example.com/webhook/submit      # análise de lead
+N8N_CHAT_WEBHOOK_URL=https://n8n.example.com/webhook/chat    # chat (obrigatório)
+N8N_WEBHOOK_AUTH=Bearer xyz         # opcional
+N8N_CALLBACK_SECRET=super-secret    # exige nos callbacks
 
+# Igniter (client/router)
+NEXT_PUBLIC_IGNITER_API_URL=http://localhost:3000
+NEXT_PUBLIC_IGNITER_API_BASE_PATH=/api/v1
+
+# Redis
+REDIS_URL=redis://localhost:6379
+
+# Telemetria (opcional)
+IGNITER_TELEMETRY_ENABLE_EVENTS=false
+IGNITER_TELEMETRY_ENABLE_METRICS=false
+IGNITER_TELEMETRY_ENABLE_TRACING=false
+IGNITER_TELEMETRY_ENABLE_CLI_INTEGRATION=false
 ```
-src/
-├── app/                  # Next.js App Router pages and layouts
-│   └── api/              # API route handlers
-│       └── [[...all]]/
-│           └── route.ts  # Igniter.js API entry point
-├── components/           # Shared, reusable UI components
-├── features/             # Business logic, grouped by feature
-│   └── example/
-│       └── controllers/  # API endpoint definitions
-├── services/             # Service initializations (Redis, Prisma, etc.)
-├── igniter.ts            # Igniter.js core instance
-├── igniter.client.ts     # Auto-generated type-safe API client
-├── igniter.router.ts     # Main API router
-└── layout.tsx            # Root layout, includes providers
-```
 
-## Available Scripts
+Nunca commitar chaves sensíveis. Em produção, preferir secret managers.
 
--   `npm run dev`: Starts the development server.
--   `npm run build`: Builds the application for production.
--   `npm run start`: Starts the production server.
--   `npm run lint`: Runs the linter.
+## Banco de Dados
+Tabelas básicas (ver `public/deliverables/*.sql`):
+- `lead_results`:
+  - `correlation_id` (PK), `status` (pending|ready|error), `improved_lead` (texto), `original_lead` (texto), `data` (jsonb), `received_at` (timestamptz)
+- `chat_messages`:
+  - `id` (uuid), `copy_id` (ref. a `lead_results.correlation_id`), `role` (user|assistant|system), `content` (texto), `message_correlation_id` (texto), `status`, `created_at`
 
-## Lead Submission UI (Vitascience)
+Indices úteis já inclusos nos scripts em `public/deliverables`.
 
-This app includes a minimal interface to submit VSL leads and trigger the n8n workflow that runs the Eugene Schwartz clone.
+## Funcionalidades
 
-### Pages
+### Chat com Clones (AI Chat multi-persona)
+- Página: `/chat`
+- Fluxo:
+  1. Selecione uma copy (cada copy é um registro em `lead_results`).
+  2. Envie mensagens; o sistema persiste a mensagem do usuário em `chat_messages`.
+  3. O n8n recebe o evento e roteia para o clone adequado (conforme regras/metadata), retornando via callback; a resposta do assistente também é persistida.
+- Histórico:
+  - Carregado por `GET /api/chat/history?copyId=...`.
+  - Envio via `POST /api/chat/send` com `{ copyId, message, context?, improvedLead?, history? }`.
+- Importante: o endpoint de chat exige `N8N_CHAT_WEBHOOK_URL` configurado. Não há fallback para `N8N_WEBHOOK_URL`.
 
-- `/lead`: Form to paste or upload the Lead text, optional title and metadata (JSON). Submits to `/api/submit-lead` and displays the JSON analysis response.
+### Análise de Lead da Copy
+- Endpoint principal: `POST /api/submit-lead`
+- Entrada mínima: `{ lead }` (ou `vsl_copy`). Opcional: `title`, `metadata`.
+- Comportamento:
+  - Gera `correlationId`, salva `lead_results` com `status=pending` e `original_lead`.
+  - Chama o webhook do n8n com `{ vsl_copy, correlationId, callbackUrl }`.
+  - O n8n processa e chama `POST /api/lead/callback` com `{ correlationId, improvedLead, ... }`.
+  - O sistema faz `upsert` e define `status=ready`.
+- Consulta:
+  - `GET /api/lead/status?correlationId=...`
+  - `GET /api/lead/get?id=...` retorna detalhes (inclui `originalLead`/`improvedLead`).
 
-### API
+### Dashboard de Performance das Copys
+- Página: `/portfolio` (progresso e entregáveis).
+- Listagem: `GET /api/lead/list?limit=50` retorna `status`, `receivedAt`, `title`, `hasImproved`.
+- Edição do texto melhorado:
+  - Dentro de `/chat`, ao selecionar uma copy, você pode salvar `improved_lead` via `POST /api/lead/update` com `{ id, improvedLead }`.
 
-- `POST /api/submit-lead`: Proxies the request to your n8n webhook URL (`N8N_WEBHOOK_URL`). Envia em formato compatível com o n8n:
+## Seleção de Clones (como funciona)
+O sistema suporta múltiplos clones/personas. A escolha do clone é responsabilidade do workflow no n8n e normalmente segue uma das estratégias abaixo:
+- Por metadata da copy: ao enviar a lead com `POST /api/submit-lead`, utilize o campo `metadata` para informar, por exemplo, `{ cloneId: "eugene" }`, `{ cloneId: "ogilvy" }`, `{ persona: "copy-chief" }`, etc. O n8n lê `lead_results.data.metadata` (via `copyId`) e decide qual clone usar.
+- Por regras de conteúdo: o n8n inspeciona o texto (`original_lead` ou contexto do chat) e aplica heurísticas para seleção.
 
-Request body (enviado ao n8n):
-
-```json
+Exemplo de envio com `metadata`:
+```bash
+POST /api/submit-lead
 {
-  "vsl_copy": "Aqui vai a lead da VSL...",
-  "title": "Lead VSL Vitascience",
-  "metadata": { "idioma": "pt-BR", "produto": "Suplemento X" },
-  "correlationId": "uuid",
-  "callbackUrl": "https://seu-dominio/api/lead/callback"
+  "lead": "... sua lead aqui ...",
+  "title": "Lead VSL Produto X",
+  "metadata": { "cloneId": "ogilvy", "campanha": "lancamento-q4" }
 }
 ```
 
-- `POST /api/lead/callback`: Endpoint chamado pelo n8n quando a lead estiver pronta. Requer header `X-Callback-Secret` (configurar `N8N_CALLBACK_SECRET`). Persiste o resultado.
+Observações:
+- O frontend atual exibe o título do chat de forma genérica; a seleção real de clone ocorre no backend (n8n) com base nos metadados.
+- Para chats, o `copyId` é suficiente para o n8n recuperar a `lead_results` e decidir o clone associado àquela copy.
 
-- `GET /api/lead/status?id={correlationId}`: Retorna `{ status: 'pending' | 'ready', improvedLead?, data?, receivedAt? }`.
+## Rotas de API (Resumo)
+- Leads
+  - `POST /api/submit-lead` – inicia processamento no n8n, retorna `{ correlationId }`.
+  - `POST /api/lead/callback` – callback autenticado via `X-Callback-Secret`.
+  - `GET /api/lead/list?limit=...` – lista últimas copys processadas.
+  - `GET /api/lead/get?id=...` – detalhes por `correlation_id`.
+  - `GET /api/lead/status?correlationId=...` – status da análise.
+  - `POST /api/lead/update` – atualiza `improved_lead`.
+- Chat
+  - `POST /api/chat/send` – envia mensagem do usuário e aciona n8n.
+  - `POST /api/chat/callback` – persiste resposta do assistente (via n8n).
+  - `GET /api/chat/history?copyId=...` – histórico por copy.
+- Infra
+  - `GET /api/ping` – healthcheck simples.
+  - `ALL /api/v1/*` – roteador Igniter.js (ex.: `/api/v1/example/hello`).
+  - `ALL /api/mcp/[transport]` – servidor MCP (opcional).
 
-### Environment Variables
+## Operação e Observabilidade
+- Logs estruturados com `logger` e `telemetry` (Igniter.js). Inclua `correlationId`/`messageCorrelationId` nos logs.
+- Configure timeouts/retries nas chamadas ao n8n (ver roadmap).
+- Healthcheck: `/api/ping` e checagens de conectividade (Supabase/Redis/n8n).
 
-Set these in Vercel Project Settings → Environment Variables:
+## Segurança
+- Não exponha `SUPABASE_SERVICE_ROLE_KEY` no cliente. Browser usa apenas `NEXT_PUBLIC_*`.
+- Callbacks exigem `X-Callback-Secret` (`N8N_CALLBACK_SECRET`).
+- Recomenda-se aplicar rate limiting nas rotas públicas (`/api/submit-lead`, `/api/chat/send`).
 
-- `N8N_WEBHOOK_URL`: The full URL of the n8n webhook trigger (e.g., `https://n8n.example.com/webhook/abcd-efgh/analyze-vsl-copy`)
-- `N8N_WEBHOOK_AUTH` (optional): If your webhook requires auth, e.g., `Bearer xxxxx` or a custom header value.
-- `N8N_CALLBACK_SECRET`: Secret compartilhado para validar callbacks do n8n.
-- `NEXT_PUBLIC_IGNITER_API_URL`: Base URL pública do app (usada para montar `callbackUrl`).
-- `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY`: Necessárias quando persistindo resultado no Supabase.
-
-On Vercel, redeploy after adding variables. The page `/lead` will warn if `N8N_WEBHOOK_URL` is not configured.
-
-### Deploy on Vercel
-
-1. Push this repo to GitHub.
-2. Import into Vercel and choose the Next.js framework.
-3. Add the environment variables above in Vercel.
-4. Deploy. After deploy, open the app and navigate to `/lead`.
-
-## Further Learning
-
-To learn more about Igniter.js and its powerful features, check out the official documentation:
-
--   **[Igniter.js GitHub Repository](https://github.com/felipebarcelospro/igniter-js)**
--   **[Official Documentation](https://igniterjs.com/docs)**
--   **[Core Concepts](https://igniterjs.com/docs/core-concepts)**
--   **[Client-Side Integration](https://igniterjs.com/docs/client-side)**
-
-## License
-
-This starter is licensed under the [MIT License](LICENSE)
+## Roadmap de Melhorias
+- Banco: FK `chat_messages.copy_id -> lead_results.correlation_id` e UNIQUE em `chat_messages(message_correlation_id)` para idempotência.
+- Resiliência: timeouts, retries exponenciais e circuit breaker nas integrações com n8n.
+- Paginação: cursor em `lead/list` e `chat/history`.
+- Observabilidade: traces por `correlationId`, métricas e painéis.
+- Build: decidir por uso de Prisma (definir models) ou removê-lo.
+- Rate limiting: por IP e por `copyId` com Redis.
+- Multi-clone UI: selector opcional de clone no frontend (quando desejado), mantendo a decisão final no n8n.

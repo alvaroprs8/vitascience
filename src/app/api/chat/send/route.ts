@@ -7,7 +7,7 @@ export const maxDuration = 300
 
 export async function POST(request: NextRequest) {
   try {
-    const chatWebhookUrl = process.env.N8N_CHAT_WEBHOOK_URL || process.env.N8N_WEBHOOK_URL
+    const chatWebhookUrl = process.env.N8N_CHAT_WEBHOOK_URL
     if (!chatWebhookUrl) {
       return Response.json({ error: 'N8N_CHAT_WEBHOOK_URL is not configured' }, { status: 500 })
     }
