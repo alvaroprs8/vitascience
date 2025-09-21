@@ -1,4 +1,5 @@
 import { SaaSLayout } from "@/components/layouts/SaaSLayout"
+import { Timeline } from "@/components/modern-timeline"
 
 export default function PortfolioVitascience() {
   const tasks: Array<{
@@ -68,51 +69,28 @@ export default function PortfolioVitascience() {
         <main className="mx-auto grid max-w-5xl gap-6">
           {tasks.map((section, idx) => {
             const percent = computeSectionProgress(section.items)
-            return (
-              <section key={idx} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div className="mb-4 flex items-center justify-between gap-4">
-                  <h2 className="text-lg font-semibold text-slate-900">{section.section}</h2>
-                  <div className="flex items-center gap-2">
-                    <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
-                      {percent === 100 ? "Concluído" : "Em progresso"}
-                    </span>
-                  </div>
-                </div>
+			return (
+				<section key={idx} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+					<div className="mb-4 flex items-center justify-between gap-4">
+						<h2 className="text-lg font-semibold text-slate-900">{section.section}</h2>
+						<div className="flex items-center gap-2">
+							<span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
+								{percent === 100 ? "Concluído" : "Em progresso"}
+							</span>
+						</div>
+					</div>
 
-                <div className="mb-4 h-2 w-full rounded-full bg-slate-100">
-                  <div
-                    className="h-2 rounded-full bg-emerald-500 transition-all"
-                    style={{ width: `${percent}%` }}
-                  />
-                </div>
-
-                <ul className="space-y-2">
-                  {section.items.map((item, i) => (
-                    <li
-                      key={i}
-                      className={`flex items-center justify-between gap-3 rounded-lg border p-3 ${
-                        item.done ? "border-emerald-100 bg-emerald-50/40 text-emerald-800" : "border-slate-200 text-slate-500"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="text-lg">{item.done ? "✅" : "⚠️"}</span>
-                        <span className="text-sm">{item.name}</span>
-                      </div>
-                      {item.href ? (
-                        <a
-                          className="text-xs font-medium text-slate-700 underline hover:text-slate-900"
-                          href={item.href}
-                          target={item.href.startsWith("http") ? "_blank" : undefined}
-                          rel={item.href.startsWith("http") ? "noreferrer" : undefined}
-                        >
-                          Abrir
-                        </a>
-                      ) : null}
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )
+					<Timeline
+						className="mt-2"
+						items={section.items.map((item) => ({
+							title: item.name,
+							description: item.done ? "Entregável concluído" : "Entregável pendente",
+							status: item.done ? "completed" : "upcoming",
+							category: section.section,
+						}))}
+					/>
+				</section>
+			)
           })}
         </main>
       </div>
