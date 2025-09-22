@@ -48,6 +48,7 @@ export default function LeadPage() {
   const [isWaiting, setIsWaiting] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [selectedClone, setSelectedClone] = useState<'eugene' | 'hormozi' | 'halbert' | 'kennedy' | 'ogilvy'>('eugene')
+  const [model, setModel] = useState<'gpt-5' | 'claude-4' | 'claude-4.1' | 'gemini-2.5-flash'>('gpt-5')
 
   useEffect(() => {
     fetch('/api/submit-lead').then(async (res) => {
@@ -153,6 +154,12 @@ export default function LeadPage() {
       const payload: any = { lead }
       if (title.trim()) payload.title = title.trim()
       // metadata removido do payload
+      {
+        const allowedModels = ['gpt-5', 'claude-4', 'claude-4.1'] as const
+        if (allowedModels.includes(model as any)) {
+          payload.model = model
+        }
+      }
 
       const res = await fetch('/api/submit-lead', {
         method: 'POST',
@@ -438,6 +445,25 @@ export default function LeadPage() {
                   value={title} 
                   onChange={(e) => setTitle(e.target.value)} 
                 />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="model" className="flex items-center gap-1.5">
+                  <Brain className="h-3.5 w-3.5" />
+                  Modelo de IA
+                </Label>
+                <select
+                  id="model"
+                  value={model}
+                  onChange={(e) => setModel(e.target.value as any)}
+                  className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                >
+                  <option value="gpt-5">gpt-5</option>
+                  <option value="claude-4">claude-4</option>
+                  <option value="claude-4.1">claude-4.1</option>
+                  <option value="gemini-2.5-flash" disabled>gemini-2.5-flash (em breve)</option>
+                </select>
+                <div className="text-xs text-slate-500">Escolha o modelo de IA para processar a análise.</div>
               </div>
 
               <div className="grid gap-2">

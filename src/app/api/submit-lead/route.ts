@@ -38,11 +38,17 @@ export async function POST(request: NextRequest) {
     const correlationId = randomUUID()
     const callbackUrl = `${baseUrl}/api/lead/callback`
 
+    // Validar modelo de IA (opcional)
+    const allowedModels = new Set(['gpt-5', 'claude-4', 'claude-4.1'])
+    const requestedModel = typeof payload?.model === 'string' ? payload.model : undefined
+    const model = allowedModels.has(requestedModel || '') ? requestedModel : undefined
+
     // Mapear para o formato esperado pelo n8n: vsl_copy
     const baseInput = {
       vsl_copy: payload.vsl_copy || payload.lead,
       title: payload.title,
       metadata: payload.metadata,
+      model,
     }
 
     const asyncPayload = { ...baseInput, correlationId, callbackUrl }
