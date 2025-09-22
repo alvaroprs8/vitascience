@@ -121,10 +121,7 @@ export default function ChatPage() {
     })()
   }, [selectedCopyId])
 
-  const handleShowCurrentForCopy = (copyId: string) => {
-    setSelectedCopyId(copyId)
-    setShowCurrentText(true)
-  }
+  // Removed explicit show-current button; selecting a copy now opens the text panel automatically
 
   const handleSaveLead = async () => {
     if (!selectedCopyId) return
@@ -247,17 +244,10 @@ export default function ChatPage() {
                         <div className="shrink-0 flex flex-col gap-2">
                           <Button 
                             size="sm" 
-                            onClick={() => setSelectedCopyId(c.id)}
+                            onClick={() => { setSelectedCopyId(c.id); setShowCurrentText(true) }}
                             className=""
                           >
                             Selecionar
-                          </Button>
-                          <Button 
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleShowCurrentForCopy(c.id)}
-                          >
-                            Mostrar texto atual
                           </Button>
                         </div>
                       </div>
