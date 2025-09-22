@@ -211,7 +211,7 @@ export default function LeadPage() {
 
   const startPolling = (id: string) => {
     let attempts = 0
-    const maxAttempts = 60
+    const maxAttempts = 120
     const intervalMs = 5000
 
     const timer = setInterval(async () => {
@@ -589,7 +589,9 @@ export default function LeadPage() {
                   <div className="h-8 w-8 rounded-full border-2 border-blue-600 border-t-transparent animate-spin" />
                   <div>
                     <h3 className="font-medium">Processando no n8n...</h3>
-                    <p className="text-xs text-slate-600">Sua análise está sendo gerada</p>
+                    <p className="text-xs text-slate-600">
+                      Isso geralmente leva de 5 a 7 minutos (pode chegar a 10). Atualizaremos automaticamente assim que finalizar.
+                    </p>
                   </div>
                 </div>
                 <Badge variant="outline" className="text-xs">Atualizando automaticamente</Badge>
