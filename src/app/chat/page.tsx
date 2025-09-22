@@ -152,7 +152,8 @@ export default function ChatPage() {
     setIsSending(true)
     try {
       const contextPayload = messages.map((m) => ({ role: m.role, content: m.content }))
-      const improvedLeadPayload = improvedLead || latestUser?.content || ''
+      // Enviar sempre o texto atual exibido no editor (prioriza editedLead)
+      const improvedLeadPayload = (editedLead || improvedLead || latestUser?.content || '').trim()
       const formattedHistory = messages
         .map((m) => {
           const label = m.role === 'user' ? 'Usuário' : m.role === 'assistant' ? 'Assistente' : 'Sistema'
