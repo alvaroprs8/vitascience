@@ -327,6 +327,32 @@ export default function LeadPage() {
     }
   }
 
+  // Supabase Realtime: quando a linha ficar pronta, atualizar automaticamente
+  useEffect(() => {
+    if (!isWaiting || !correlationId) return
+    const channel = (supabase as any)
+      .channel(`lead_results:${correlationId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'lead_results', filter: `correlation_id=eq.${correlationId}` },
+        (payload: any) => {
+          const row = payload?.new || payload?.record || null
+          const status = row?.status
+          if (status === 'ready') {
+            loadAnalysis(correlationId)
+            try { (channel as any).unsubscribe?.() } catch {}
+            try { (supabase as any).removeChannel?.(channel) } catch {}
+          }
+        }
+      )
+      .subscribe()
+
+    return () => {
+      try { (channel as any).unsubscribe?.() } catch {}
+      try { (supabase as any).removeChannel?.(channel) } catch {}
+    }
+  }, [isWaiting, correlationId, supabase])
+
   // Carregar histórico ao montar a página
   useEffect(() => {
     loadHistory().catch(() => {})
@@ -476,6 +502,10 @@ export default function LeadPage() {
                 <div className="text-xs text-slate-500 flex items-center gap-1.5">
                   <Info className="h-3.5 w-3.5 text-slate-400" />
                   Dica: você pode enviar um arquivo ou colar o texto diretamente.
+                </div>
+                <div className="text-xs text-slate-600 flex items-start gap-1.5">
+                  <Info className="h-3.5 w-3.5 text-slate-400 mt-0.5" />
+                  A análise normalmente leva de 5 a 7 minutos (podendo chegar a 10). Manteremos esta página atualizada automaticamente assim que finalizar.
                 </div>
               </div>
 
