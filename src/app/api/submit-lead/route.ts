@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       metadata: payload.metadata,
     }
 
-    const asyncPayload = { ...baseInput, correlationId, callbackUrl }
+    const asyncPayload = { ...baseInput, correlationId, callbackUrl, type: 'Analise' }
 
     // Persist a pending record with the original lead before calling n8n
     {
