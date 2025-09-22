@@ -192,7 +192,18 @@ export default function LeadPage() {
         setImprovedLead(text || '')
       }
     } catch (err: any) {
-      setError(err?.message || 'Erro inesperado')
+      const message = String(err?.message || '')
+      if (/timeout|timed out|504|exceeded|network|fetch failed|abort/i.test(message)) {
+        // Suprimir erro de timeout/rede: manter experiência como "processando"
+        setError(null)
+        setIsWaiting(true)
+        setResult(null)
+        setImprovedLead('')
+        setOriginalLead(lead)
+        // Sem correlationId conhecido: fallback vai atualizar o histórico periodicamente
+      } else {
+        setError(message || 'Erro inesperado')
+      }
     } finally {
       setIsSubmitting(false)
     }
@@ -283,6 +294,17 @@ export default function LeadPage() {
       setHistory(Array.isArray(data.items) ? data.items : [])
     } catch {}
   }
+
+  // Fallback: se estamos aguardando mas sem correlationId (ex.: submit com timeout),
+  // atualiza o histórico periodicamente para refletir quando o n8n concluir.
+  useEffect(() => {
+    if (isWaiting && !correlationId) {
+      const t = setInterval(() => {
+        loadHistory().catch(() => {})
+      }, 5000)
+      return () => clearInterval(t)
+    }
+  }, [isWaiting, correlationId])
 
   const loadAnalysis = async (id: string) => {
     try {
