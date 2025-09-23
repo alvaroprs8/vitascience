@@ -13,7 +13,6 @@ export function SaaSLayout({ children }: SaaSLayoutProps) {
     { icon: Home, label: "Visão geral", onClick: () => { window.location.href = "/" } },
     { icon: MessageSquare, label: "Chat", onClick: () => { window.location.href = "/chat" } },
     { icon: Workflow, label: "Clone do Eugene", onClick: () => { window.location.href = "/lead" } },
-    { icon: Briefcase, label: "Portfolio", onClick: () => { window.location.href = "/portfolio" } },
     { icon: LayoutDashboard, label: "Admin", onClick: () => { window.location.href = "/admin" } },
   ] as const;
 
